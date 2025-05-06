@@ -23,7 +23,7 @@ export default function SignInPage() {
         email,
         password,
         redirect: false,
-        redirectTo: '/'
+        callbackUrl: '/'
       });
 
       if (result?.error) {

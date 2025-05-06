@@ -44,8 +44,8 @@ export async function POST(req: Request) {
     }
 
     // ユーザー名の重複チェック
-    const existingUsername = await prisma.user.findUnique({
-      where: { username },
+    const existingUsername = await prisma.user.findFirst({
+      where: { name: username },
     });
 
     if (existingUsername) {
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     // ユーザーの作成
     const user = await prisma.user.create({
       data: {
-        username,
+        name: username,
         email,
         password: hashedPassword,
       },
