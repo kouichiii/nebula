@@ -1,8 +1,9 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
+import type { JWT } from 'next-auth/jwt';
 
-export default NextAuth({
+export const authOptions = {
   providers: [
     // Credentials（自前認証）
     CredentialsProvider({
@@ -12,7 +13,7 @@ export default NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials, req) {
-        const res = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/signin`, {
+        const res = await fetch(`${process.env.NEXTAUTH_URL}/api/signin`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -22,7 +23,7 @@ export default NextAuth({
         });
 
         const user = await res.json();
-        if (res.ok && user) return user;
+        if (res.ok && user.id) return { id: user.id };
         return null;
       },
     }),
@@ -39,25 +40,25 @@ export default NextAuth({
   },
 
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const,
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: { id: string } }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.email = token.email as string;
-        session.user.name = token.name as string;
-      }
-      return session;
+    async session({ session, token }: { session: any; token: JWT }) {
+      return {
+        user: {
+          id: token.id as string,
+        },
+        expires: session.expires,
+      };
     },
   },
-});
+};
+
+export default NextAuth(authOptions);

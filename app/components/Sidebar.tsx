@@ -11,6 +11,7 @@ export default function Sidebar() {
   const { data: session } = useSession();
 
   const isActive = (path: string) => pathname === path;
+  
 
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 fixed left-0 top-0 flex flex-col">
@@ -64,7 +65,7 @@ export default function Sidebar() {
         {session ? (
           <div className="space-y-4">
             <Link
-              href={`/users/${session.user?.id}`}
+              href={`/profile`}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-50 transition-colors"
             >
               {session.user?.image ? (
