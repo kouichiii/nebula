@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import type { JWT } from 'next-auth/jwt';
-
+import type { User } from 'next-auth';
 export const authOptions = {
   providers: [
     // Credentials（自前認証）
@@ -23,7 +23,7 @@ export const authOptions = {
         });
 
         const user = await res.json();
-        if (res.ok && user.id) return { id: user.id };
+        if (res.ok && user.id) return user;
         return null;
       },
     }),
@@ -44,20 +44,25 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: { id: string } }) {
+    async jwt({ token, user }: { token: JWT; user?:User }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.iconUrl = user.iconUrl;
       }
       return token;
     },
     async session({ session, token }: { session: any; token: JWT }) {
-      return {
-        user: {
-          id: token.id as string,
-        },
-        expires: session.expires,
+      session.user = {
+        ...session.user,
+        id: token.id as string,
+        name: token.name as string,
+        email: token.email as string,
+        iconUrl: token.iconUrl as string,
       };
-    },
+      return session;
+    }
   },
 };
 

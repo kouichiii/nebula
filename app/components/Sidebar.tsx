@@ -8,7 +8,8 @@ import Image from 'next/image';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  console.log("session",session);
 
   const isActive = (path: string) => pathname === path;
   
@@ -62,15 +63,25 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-6 border-t border-gray-200">
-        {session ? (
+        {status === 'loading' ? (
+          // 🦴 スケルトン表示
+          <div className="flex items-center gap-3 animate-pulse">
+            <div className="w-10 h-10 bg-gray-200 rounded-full" />
+            <div className="space-y-2">
+              <div className="h-4 w-24 bg-gray-200 rounded" />
+              <div className="h-3 w-36 bg-gray-200 rounded" />
+            </div>
+          </div>
+        ) : session ? (
+          // ✅ セッションがあるときの本来の表示
           <div className="space-y-4">
             <Link
               href={`/profile`}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-50 transition-colors"
             >
-              {session.user?.image ? (
+              {session.user?.iconUrl ? (
                 <Image
-                  src={session.user.image}
+                  src={session.user.iconUrl}
                   alt={session.user.name || ''}
                   width={40}
                   height={40}
@@ -100,6 +111,7 @@ export default function Sidebar() {
             </button>
           </div>
         ) : (
+          // 🔓 未ログイン時
           <Link
             href="/auth/signin"
             className="block w-full text-center px-4 py-2 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
@@ -108,6 +120,7 @@ export default function Sidebar() {
           </Link>
         )}
       </div>
+
     </div>
   );
 } 
