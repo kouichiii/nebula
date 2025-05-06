@@ -48,3 +48,35 @@ export async function POST(req: Request) {
     await client.close();
   }
 }
+
+export async function GET() {
+  try {
+    const articles = await prisma.article.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        excerpt: true,
+        tags: true,
+        mongoId: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            iconUrl: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(articles);
+  } catch (err) {
+    console.error('記事取得エラー:', err);
+    return NextResponse.json({ message: '記事取得に失敗しました' }, { status: 500 });
+  }
+}

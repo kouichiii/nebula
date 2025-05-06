@@ -9,7 +9,6 @@ import Image from 'next/image';
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  console.log("session",session);
 
   const isActive = (path: string) => pathname === path;
   
@@ -33,12 +32,12 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          href="/categories"
+          href="/swipe"
           className={`flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 ${
-            isActive('/categories') ? 'bg-purple-50 text-purple-600' : ''
+            isActive('/swipe') ? 'bg-purple-50 text-purple-600' : ''
           }`}
         >
-          <span className="mx-3">カテゴリー</span>
+          <span className="mx-3">見つける</span>
         </Link>
 
         <Link
