@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -61,6 +62,18 @@ export default function SignUpPage() {
       }
     } finally {
       setIsLoading(false);
+      try {
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+          callbackUrl: '/'
+        });
+      } catch (error) {
+        setError('登録はできましたが、ログインに失敗しました。時間をおいてから再度ログインしてください。');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
