@@ -1,0 +1,17 @@
+[
+  {
+    "name": "山田 太郎",
+    "email": "yamada@example.com",
+    "password": "password123"
+  },
+  {
+    "name": "佐藤 花子",
+    "email": "sato@example.com",
+    "password": "password123"
+  },
+  {
+    "name": "高橋 健一",
+    "email": "takahashi@example.com",
+    "password": "password123"
+  }
+]

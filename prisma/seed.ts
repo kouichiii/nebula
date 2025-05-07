@@ -1,90 +1,97 @@
 import { PrismaClient } from '@prisma/client';
+import { MongoClient } from 'mongodb';
 import { hash } from 'bcryptjs';
+import fs from 'fs/promises';
+import path from 'path';
 
 const prisma = new PrismaClient();
+const mongoClient = new MongoClient(process.env.MONGODB_URI!);
 
 async function main() {
-  // 既存のデータを削除
+  // 既存データ削除
   await prisma.article.deleteMany();
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
-  // カテゴリーの作成
-  const webDevCategory = await prisma.category.create({
-    data: {
-      name: 'Web開発',
-    },
-  });
+  await mongoClient.connect();
+  const db = mongoClient.db('nebula');
+  const articleCollection = db.collection('articles');
 
-  const designCategory = await prisma.category.create({
-    data: {
-      name: 'デザイン',
-    },
-  });
+  // JSON 読み込み
+  const usersPath = path.join(__dirname, 'seed-data', 'users.json');
+  const articlesPath = path.join(__dirname, 'seed-data', 'articles.json');
 
-  const mlCategory = await prisma.category.create({
-    data: {
-      name: '機械学習',
-    },
-  });
+  const usersData = await fs.readFile(usersPath, 'utf-8');
+  const articlesData = await fs.readFile(articlesPath, 'utf-8');
 
-  // テストユーザーの作成
-  const hashedPassword = await hash('password123', 12);
-  const testUser = await prisma.user.create({
-    data: {
-      name: 'testuser',
-      email: 'test@example.com',
-      password: hashedPassword,
-    },
-  });
+  const users = JSON.parse(usersData) as {
+    name: string;
+    email: string;
+    password: string;
+  }[];
 
-  // サンプル記事の作成
-  await prisma.article.create({
-    data: {
-      title: 'Next.jsの始め方',
-      excerpt: 'Next.jsを使用してモダンなWebアプリケーションを構築する方法を解説します。',
-      content: 'Next.jsは、Reactベースのフレームワークで...',
-      userId: testUser.id,
-      categoryId: webDevCategory.id,
-      mongoId: '681874d43f2460ed93060920',
-    },
-  });
+  const articles = JSON.parse(articlesData) as {
+    title: string;
+    excerpt: string;
+    content: string;
+    category: string;
+    authorEmail: string;
+    tags?: string[];
+  }[];
 
-  await prisma.article.create({
-    data: {
-      title: 'UIデザインの基本原則',
-      excerpt: '効果的なUIデザインを作成するための重要な原則を紹介します。',
-      content: '良いUIデザインは、ユーザー体験を向上させる...',
-      userId: testUser.id,
-      categoryId: designCategory.id,
-      mongoId: '681874d43f2460ed9306091f',
-    },
-  });
+  // ユーザー作成
+  const userMap: Record<string, string> = {};
+  for (const user of users) {
+    const hashedPassword = await hash(user.password, 12);
+    const createdUser = await prisma.user.create({
+      data: {
+        name: user.name,
+        email: user.email,
+        password: hashedPassword,
+      },
+    });
+    userMap[user.email] = createdUser.id;
+  }
 
-  await prisma.article.create({
-    data: {
-      title: '機械学習入門',
-      excerpt: '機械学習の基礎から実践まで、わかりやすく解説します。',
-      content: '機械学習は、データから学習し、予測や判断を行う...',
-      userId: testUser.id,
-      categoryId: mlCategory.id,
-      mongoId: '681874d43f2460ed93060921',
-    },
-  });
+  // カテゴリ収集・作成
+  const uniqueCategories = Array.from(new Set(articles.map((a) => a.category)));
+  const categoryMap: Record<string, string> = {};
+  for (const category of uniqueCategories) {
+    const createdCategory = await prisma.category.create({
+      data: { name: category },
+    });
+    categoryMap[category] = createdCategory.id;
+  }
 
-  // デフォルトのカテゴリーを作成
-  const defaultCategory = await prisma.category.create({
-    data: {
-      name: '未分類',
-    },
-  });
+  // 記事作成（MongoDB + Prisma）
+  for (const article of articles) {
+    const mongoRes = await articleCollection.insertOne({
+      content: article.content,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await prisma.article.create({
+      data: {
+        title: article.title,
+        excerpt: article.excerpt,
+        mongoId: mongoRes.insertedId.toString(),
+        userId: userMap[article.authorEmail],
+        categoryId: categoryMap[article.category],
+        tags: article.tags || [],
+      },
+    });
+  }
+
+  console.log(`✅ Users: ${users.length}, Articles: ${articles.length}`);
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Seed Error:', e);
     process.exit(1);
   })
   .finally(async () => {
+    await mongoClient.close();
     await prisma.$disconnect();
-  }); 
+  });

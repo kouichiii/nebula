@@ -1,0 +1,90 @@
+[
+  {
+    "title": "ReactのuseEffect完全ガイド",
+    "excerpt": "ReactのuseEffectフックの使い方と注意点を解説します。",
+    "content": "# useEffect完全ガイド\n\nReactの`useEffect`フックは、副作用（データ取得やDOMの変更など）を扱うために使われます。\n\n## 基本的な使い方\n```tsx\nuseEffect(() => {\n  console.log(\"コンポーネントがマウントされました\");\n}, []);\n```\n\n## クリーンアップ関数\n```tsx\nuseEffect(() => {\n  const timer = setTimeout(() => console.log(\"Hello\"), 1000);\n  return () => clearTimeout(timer);\n}, []);\n```\n",
+    "category": "Web開発",
+    "authorEmail": "sato@example.com",
+    "tags": ["React", "useEffect", "Hooks"]
+  },
+  {
+    "title": "Figmaで始めるUIデザイン",
+    "excerpt": "Figmaを使った基本的なUIデザインのワークフローを紹介します。",
+    "content": "# Figmaで始めるUIデザイン\n\n## 基本のフレーム作成\n- Frameツールを選択\n- デバイスサイズを指定して作成\n\n## コンポーネント化のメリット\n| 項目 | メリット |\n|------|----------|\n| 再利用性 | 高い |\n| 一貫性 | 保てる |\n| メンテナンス性 | 優れる |\n\n## まとめ\nFigmaは直感的に使えるデザインツールです。まずは小さなコンポーネントから始めましょう。",
+    "category": "デザイン",
+    "authorEmail": "sato@example.com",
+    "tags": ["Figma", "UI", "デザイン"]
+  },
+  {
+    "title": "機械学習の種類と特徴",
+    "excerpt": "教師あり学習、教師なし学習、強化学習の違いと用途を解説します。",
+    "content": "# 機械学習の種類\n\n## 教師あり学習\n- 正解データあり\n- 例：回帰、分類\n\n## 教師なし学習\n- 正解なし\n- 例：クラスタリング\n\n## 強化学習\n- 行動に報酬\n- ゲームやロボット制御に使われる\n\n```python\n# scikit-learnの例\nfrom sklearn.linear_model import LinearRegression\nmodel = LinearRegression()\n```\n",
+    "category": "機械学習",
+    "authorEmail": "sato@example.com",
+    "tags": ["教師あり学習", "強化学習", "クラスタリング"]
+  },
+  {
+    "title": "Next.jsのRoutingシステム",
+    "excerpt": "App RouterとPages Routerの違いと活用方法をまとめます。",
+    "content": "# Next.js Routing\n\n## Pages Router\n- ファイルベースのルーティング\n- `pages/index.tsx`\n\n## App Router（v13以降）\n- `app/`ディレクトリを使用\n- LayoutsやServer Componentsが使える\n\n```tsx\nexport default function Page() {\n  return <h1>Hello App Router</h1>;\n}\n```\n",
+    "category": "Web開発",
+    "authorEmail": "yamada@example.com",
+    "tags": ["Next.js", "App Router"]
+  },
+  {
+    "title": "配色の心理学",
+    "excerpt": "色がユーザーに与える心理的効果を紹介します。",
+    "content": "# 配色と心理学\n\n| 色 | 印象 |\n|----|------|\n| 赤 | 情熱、緊張 |\n| 青 | 安心、誠実 |\n| 緑 | 調和、健康 |\n\n## 実践例\n- 医療系：青・白\n- 食品系：赤・黄\n\nデザインでは意図した印象を持たせるために色を選びましょう。",
+    "category": "デザイン",
+    "authorEmail": "yamada@example.com",
+    "tags": ["色彩", "心理学", "UX"]
+  },
+  {
+    "title": "Pythonで学ぶ線形回帰",
+    "excerpt": "scikit-learnを使って線形回帰を実装してみましょう。",
+    "content": "# Pythonで線形回帰\n\n```python\nfrom sklearn.linear_model import LinearRegression\nX = [[1], [2], [3]]\ny = [2, 4, 6]\nmodel = LinearRegression().fit(X, y)\nprint(model.coef_, model.intercept_)\n```\n\n## 出力例\n```\n[2.] 0.0\n```\n",
+    "category": "機械学習",
+    "authorEmail": "yamada@example.com",
+    "tags": ["Python", "回帰分析"]
+  },
+  {
+    "title": "TypeScriptの型ガイド",
+    "excerpt": "基本型からユーティリティ型までTypeScriptの型を総復習します。",
+    "content": "# TypeScript型ガイド\n\n```ts\ntype User = {\n  id: number;\n  name: string;\n};\n\nfunction greet(user: User): string {\n  return `Hello ${user.name}`;\n}\n```\n\n## ユーティリティ型\n- Partial<T>\n- Pick<T, K>\n",
+    "category": "Web開発",
+    "authorEmail": "takahashi@example.com",
+    "tags": ["TypeScript", "型"]
+  },
+  {
+    "title": "デザインで気をつけたいコントラスト比",
+    "excerpt": "アクセシビリティの観点から重要な色のコントラストについて解説します。",
+    "content": "# コントラスト比とは\n\n- 文字と背景の色差\n- 最低でも4.5:1を推奨（WCAG）\n\n## チェックツール\n- [WebAIM](https://webaim.org/resources/contrastchecker/)\n\n```css\n.color-example {\n  color: #333;\n  background-color: #fff;\n}\n```\n",
+    "category": "デザイン",
+    "authorEmail": "takahashi@example.com",
+    "tags": ["アクセシビリティ", "カラー"]
+  },
+  {
+    "title": "決定木アルゴリズムの理解",
+    "excerpt": "分類や回帰に使える決定木のロジックと可視化を学びます。",
+    "content": "# 決定木とは\n\n- 質問を繰り返して分類\n- 可視化しやすい\n\n```python\nfrom sklearn.tree import DecisionTreeClassifier\nmodel = DecisionTreeClassifier()\n```\n\n## メリット\n- 説明性が高い\n- 前処理が少ない\n",
+    "category": "機械学習",
+    "authorEmail": "takahashi@example.com",
+    "tags": ["決定木", "分類"]
+  },
+  {
+    "title": "Zustandで状態管理をシンプルに",
+    "excerpt": "軽量で書きやすいZustandの使い方とReactとの統合方法を紹介します。",
+    "content": "# Zustandの使い方\n\n```ts\nimport create from 'zustand';\n\nconst useStore = create((set) => ({\n  count: 0,\n  increment: () => set((state) => ({ count: state.count + 1 }))\n}));\n```\n\n## 特徴\n- Context不要\n- シンプルなAPI\n",
+    "category": "Web開発",
+    "authorEmail": "takahashi@example.com",
+    "tags": ["Zustand", "React", "状態管理"]
+  },
+  {
+    "title": "UI改善のためのユーザビリティテスト",
+    "excerpt": "ユーザーからのフィードバックを取り入れる手法を解説します。",
+    "content": "# ユーザビリティテスト\n\n## 準備\n- タスクの設計\n- 被験者の選定\n\n## 実施\n- 実際に操作してもらい観察\n\n## 改善点の抽出\n- ボトルネックを特定\n- 優先順位をつけて修正\n\n| 手法 | 特徴 |\n|------|------|\n| Think Aloud | ユーザーの思考を観察 |\n| A/Bテスト | データで判断 |\n",
+    "category": "デザイン",
+    "authorEmail": "takahashi@example.com",
+    "tags": ["ユーザビリティ", "UI"]
+  }
+]
