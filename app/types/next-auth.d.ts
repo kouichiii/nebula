@@ -24,4 +24,18 @@ declare module 'next-auth' {
     email: string;
     iconUrl: string;
   }
+
+  interface ArticleCard {
+    id: string;
+    title: string;
+    excerpt: string;
+    user: {
+      name: string;
+      iconUrl: string;
+    };
+    category: {
+      name: string;
+    };
+  }
+  
 }
