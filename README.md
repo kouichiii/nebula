@@ -1,7 +1,6 @@
-nebula
-The blog platform with a nebula of stars that praise your article.
+# カードをスワイプして気になる記事を探すことができるブログプラットフォームです。
 
-# ローカルセットアップ方法
+## ローカルセットアップ方法
 
 
 npm i
