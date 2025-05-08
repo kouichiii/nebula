@@ -13,6 +13,8 @@ npx prisma migrate dev --name init
 npx prisma db seed
 
 
+サーバー立ち上げ
+npm run dev
 
 
 データベース確認
