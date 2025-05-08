@@ -75,12 +75,9 @@ export default async function ProfilePage() {
 
           <div className="mt-8 pt-8 border-t border-purple-100">
             <div className="flex justify-center space-x-4">
-              <button className="px-6 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors">
+              <Link href="/profile/edit" className="px-6 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors">
                 プロフィール編集
-              </button>
-              <button className="px-6 py-2 border border-purple-600 text-purple-600 rounded-full hover:bg-purple-50 transition-colors">
-                設定
-              </button>
+              </Link>
             </div>
           </div>
 

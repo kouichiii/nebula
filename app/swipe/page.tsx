@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SwipeCard from './components/SwipeCard';
 import { ArticleCard } from 'next-auth';
+import { FaExpandAlt, FaTrashAlt } from 'react-icons/fa';
 
 interface Article {
   id: string;
@@ -30,7 +31,6 @@ export default function SwipePage() {
       setArticles((prev) => [...prev, ...data]);
     };
 
-    // 初回 or 残り2枚以下なら追加読み込み
     if (articles.length === 0 || index >= articles.length - 2) {
       fetchArticles();
     }
@@ -42,9 +42,19 @@ export default function SwipePage() {
 
   return (
     <div className="relative h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
+      {/* 左マーク（記事を開く） */}
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-500 opacity-50">
+        <FaExpandAlt size={36} title="記事を開く" />
+      </div>
+
+      {/* 右マーク（スキップ） */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 opacity-50">
+        <FaTrashAlt size={36} title="スキップ" />
+      </div>
+
+      {/* スワイプカード */}
       {articles.slice(index, index + 2).map((article, i) => {
         const isFront = i === 0;
-
         return (
           <SwipeCard
             key={article.id}

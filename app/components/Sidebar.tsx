@@ -41,12 +41,12 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          href="/tags"
+          href="/search"
           className={`flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 ${
-            isActive('/tags') ? 'bg-purple-50 text-purple-600' : ''
+            isActive('/search') ? 'bg-purple-50 text-purple-600' : ''
           }`}
         >
-          <span className="mx-3">タグ</span>
+          <span className="mx-3">検索する</span>
         </Link>
 
         {session && (

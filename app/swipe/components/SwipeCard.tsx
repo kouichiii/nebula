@@ -7,7 +7,7 @@ import { ArticleCard } from 'next-auth';
 export default function SwipeCard({
   article,
   onSwipe,
-  isFront
+  isFront,
 }: {
   article: ArticleCard;
   onSwipe: (dir: 'left' | 'right') => void;
