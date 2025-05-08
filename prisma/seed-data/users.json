@@ -2,12 +2,14 @@
   {
     "name": "山田 太郎",
     "email": "yamada@example.com",
-    "password": "password123"
+    "password": "password123",
+    "bio": "こんにちは、私は山田太郎です。"
   },
   {
     "name": "佐藤 花子",
     "email": "sato@example.com",
-    "password": "password123"
+    "password": "password123",
+    "bio": "こんにちは、私は佐藤花子です。"
   },
   {
     "name": "高橋 健一",

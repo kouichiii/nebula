@@ -1,17 +1,13 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useSession, signOut } from 'next-auth/react';
-import Image from 'next/image';
+import { signOut } from 'next-auth/react';
+import SmallProfile from './SmallProfile';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
+import LogoutButton from './LogoutButton';
 
-export default function Sidebar() {
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
-  const isActive = (path: string) => pathname === path;
-  
+export default async function Sidebar() {
+  const session = await getServerSession(authOptions);
 
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 fixed left-0 top-0 flex flex-col">
@@ -24,27 +20,21 @@ export default function Sidebar() {
       <nav className="flex-1">
         <Link
           href="/articles"
-          className={`flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 ${
-            isActive('/articles') ? 'bg-purple-50 text-purple-600' : ''
-          }`}
+          className="flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
         >
           <span className="mx-3">記事一覧</span>
         </Link>
 
         <Link
           href="/swipe"
-          className={`flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 ${
-            isActive('/swipe') ? 'bg-purple-50 text-purple-600' : ''
-          }`}
+          className="flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
         >
           <span className="mx-3">見つける</span>
         </Link>
 
         <Link
           href="/search"
-          className={`flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 ${
-            isActive('/search') ? 'bg-purple-50 text-purple-600' : ''
-          }`}
+          className="flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
         >
           <span className="mx-3">検索する</span>
         </Link>
@@ -52,9 +42,7 @@ export default function Sidebar() {
         {session && (
           <Link
             href="/articles/new"
-            className={`flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 ${
-              isActive('/articles/new') ? 'bg-purple-50 text-purple-600' : ''
-            }`}
+            className="flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
           >
             <span className="mx-3">新規記事を投稿</span>
           </Link>
@@ -62,52 +50,13 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-6 border-t border-gray-200">
-        {status === 'loading' ? (
-          // 🦴 スケルトン表示
-          <div className="flex items-center gap-3 animate-pulse">
-            <div className="w-10 h-10 bg-gray-200 rounded-full" />
-            <div className="space-y-2">
-              <div className="h-4 w-24 bg-gray-200 rounded" />
-              <div className="h-3 w-36 bg-gray-200 rounded" />
-            </div>
-          </div>
-        ) : session ? (
+        { session ? (
           // ✅ セッションがあるときの本来の表示
           <div className="space-y-4">
-            <Link
-              href={`/profile`}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-50 transition-colors"
-            >
-              {session.user?.iconUrl ? (
-                <Image
-                  src={session.user.iconUrl}
-                  alt={session.user.name || ''}
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-              ) : (
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                  <span className="text-purple-600 text-lg font-semibold">
-                    {session.user?.name?.[0] || session.user?.email?.[0] || '?'}
-                  </span>
-                </div>
-              )}
-              <div>
-                <div className="font-medium text-gray-900">
-                  {session.user?.name || 'ユーザー'}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {session.user?.email}
-                </div>
-              </div>
-            </Link>
-            <button
-              onClick={() => signOut()}
-              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-            >
-              ログアウト
-            </button>
+            <div className="space-y-4">
+              <SmallProfile userId={session.user.id} />
+              <LogoutButton />
+            </div>
           </div>
         ) : (
           // 🔓 未ログイン時

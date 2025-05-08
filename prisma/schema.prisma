@@ -19,6 +19,7 @@ model User {
   email     String    @unique
   password  String
   iconUrl   String?
+  bio       String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   articles  Article[]

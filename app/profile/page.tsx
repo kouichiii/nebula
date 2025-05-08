@@ -16,6 +16,7 @@ export default async function ProfilePage() {
       name: true,
       iconUrl: true,
       createdAt: true,
+      bio: true,
       articles: {
         select: {
           id: true,
@@ -58,6 +59,11 @@ export default async function ProfilePage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">{user.name}</h1>
                 <p className="text-purple-600 text-sm">@{session.user.id}</p>
+                {user.bio ? (
+                  <p className="mt-2 text-gray-700 whitespace-pre-wrap">{user.bio}</p>
+                ) : (
+                  <p className="mt-2 text-gray-400 italic">自己紹介文はまだ登録されていません</p>
+                )}
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
