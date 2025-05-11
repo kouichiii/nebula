@@ -1,7 +1,7 @@
 export default function ArticlesLoading() {
   return (
     <div className="max-w-4xl mx-auto animate-pulse">
-      <h1 className="text-3xl font-bold text-purple-800 mb-8 bg-purple-100 h-10 w-1/3 rounded" />
+      <h1 className="text-3xl font-bold text-purple-800 mb-8 mt-8 bg-purple-100 h-10 w-1/3 rounded" />
       <div className="space-y-6">
         {[...Array(3)].map((_, i) => (
           <article
