@@ -49,9 +49,22 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const q = searchParams.get('q')?.trim() || ''
+
+  const where: any = q
+    ? {
+        OR: [
+          { title: { contains: q, mode: "insensitive" } },
+          { excerpt: { contains: q, mode: "insensitive" } },
+        ]
+      }
+    : {}
+
   try {
     const articles = await prisma.article.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
