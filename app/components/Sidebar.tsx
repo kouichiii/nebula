@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
 import SmallProfile from './SmallProfile';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/pages/api/auth/[...nextauth]';

@@ -35,6 +35,7 @@ export default function SignInPage() {
       setError('ログイン中にエラーが発生しました。');
     } finally {
       setIsLoading(false);
+      router.refresh();
     }
   };
 
