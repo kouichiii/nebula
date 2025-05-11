@@ -16,8 +16,8 @@ export default async function ArticlesPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="container max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-8 mt-8">
         <h1 className="text-3xl font-bold">記事一覧</h1>
       </div>
       <div className="grid gap-6">
