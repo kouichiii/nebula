@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
 
 // GET: 現在のユーザー情報を取得
 export async function GET() {

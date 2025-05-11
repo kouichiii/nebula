@@ -6,10 +6,8 @@ import MarkdownEditor from '../components/MarkdownEditor';
 
 export default function NewArticlePage() {
   const router = useRouter();
-  const [step, setStep] = useState(1);
   const [title, setTitle] = useState('');
   const [excerpt, setExcerpt] = useState('');
-  const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState<any[]>([]);
@@ -70,7 +68,7 @@ export default function NewArticlePage() {
       <h1 className="text-3xl font-bold mb-4">記事を投稿する</h1>
       
       {/* ステップ1: タイトルと本文 */}
-      <div className={`space-y-4 ${step === 1 ? 'block' : 'hidden'}`}>
+      <div className="space-y-4 block">
         <div>
           <label className="block font-medium">タイトル</label>
           <input
