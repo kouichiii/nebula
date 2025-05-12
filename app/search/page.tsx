@@ -22,7 +22,7 @@ export default function SearchPage() {
     (async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/articles?q=${encodeURIComponent(initialQ)}`);
+        const res = await fetch(`/api/articles/all?q=${encodeURIComponent(initialQ)}`);
         if (!res.ok) throw new Error('検索に失敗しました');
         setResults(await res.json());
       } catch (e: any) {

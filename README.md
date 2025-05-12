@@ -20,4 +20,4 @@ npm run dev
 npx prisma studio
 
 記事データ確認
-http/localhost:8082
+http/localhost:8081
