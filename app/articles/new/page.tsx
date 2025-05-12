@@ -31,7 +31,7 @@ export default function NewArticlePage() {
     setError('');
 
     try {
-      const response = await fetch('/api/articles', {
+      const response = await fetch('/api/articles/all/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

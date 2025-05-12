@@ -32,6 +32,7 @@
     "react-markdown": "^9.0.1",
     "react-swipeable": "^7.0.2",
     "react-tinder-card": "^1.6.4",
+    "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.0"
   },
   "devDependencies": {

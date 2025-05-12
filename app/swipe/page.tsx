@@ -26,12 +26,13 @@ export default function SwipePage() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const res = await fetch(`/api/articles?skip=${articles.length}&take=5`);
+      const res = await fetch(`/api/articles/random?skip=${articles.length}&take=5`);
       const data = await res.json();
+      console.log('Skip:', articles.length, "Fetched articles:", data);
       setArticles((prev) => [...prev, ...data]);
     };
 
-    if (articles.length === 0 || index >= articles.length - 2) {
+    if (index >= articles.length - 2) {
       fetchArticles();
     }
   }, [index, articles.length]);
