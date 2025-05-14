@@ -61,7 +61,6 @@ export default function SignUpPage() {
         setError('登録中にエラーが発生しました。');
       }
     } finally {
-      setIsLoading(false);
       try {
         const result = await signIn('credentials', {
           email: formData.email,
@@ -70,9 +69,10 @@ export default function SignUpPage() {
           callbackUrl: '/'
         });
       } catch (error) {
-        setError('登録はできましたが、ログインに失敗しました。時間をおいてから再度ログインしてください。');
+        setError('登録はできましたがログインに失敗しました。時間をおいてから再度ログインしてください。');
       } finally {
         setIsLoading(false);
+        router.refresh();
       }
     }
   };

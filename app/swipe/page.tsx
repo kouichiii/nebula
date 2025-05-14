@@ -26,7 +26,7 @@ export default function SwipePage() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const res = await fetch(`/api/articles/random?skip=${articles.length}&take=5`);
+      const res = await fetch(`/api/articles/random?&take=5`);
       const data = await res.json();
       console.log('Skip:', articles.length, "Fetched articles:", data);
       setArticles((prev) => [...prev, ...data]);
