@@ -40,7 +40,7 @@ export default function SearchPage() {
         if (initialQ)       params.append('q', initialQ);
         if (initialCatId)   params.append('categoryId', initialCatId);
 
-        const res = await fetch(`/api/articles?${params.toString()}`);
+        const res = await fetch(`/api/articles/all?${params.toString()}`);
         if (!res.ok) throw new Error('検索に失敗しました');
         setResults(await res.json());
       } catch (e: any) {
