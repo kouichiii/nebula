@@ -52,8 +52,15 @@ export async function POST(req: Request) {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const q = searchParams.get('q')?.trim() || ''
+  const categoryId = searchParams.get('categoryId')?.trim() || ''
 
-  const where: any = q
+  // ← ここを追加
+  console.log("[API] /api/articles called");
+  console.log("  q          =", JSON.stringify(q));
+  console.log("  categoryId =", JSON.stringify(categoryId));
+
+  // キーワード検索条件
+  const keywordWhere: any = q
     ? {
         OR: [
           { title: { contains: q, mode: "insensitive" } },
@@ -61,6 +68,22 @@ export async function GET(request: Request) {
         ]
       }
     : {}
+
+  // カテゴリ検索条件
+  const categoryWhere: any = categoryId
+    ? {
+        categoryId: categoryId,
+      }
+    : {}
+
+  // AND条件で結合
+  const where: any = 
+    q || categoryId
+      ? { AND: [keywordWhere, categoryWhere].filter(clause => Object.keys(clause).length > 0) }
+      : {};
+
+  console.log("  prisma.where =", JSON.stringify(where, null, 2));
+  // ← ここまで
 
   try {
     const articles = await prisma.article.findMany({
