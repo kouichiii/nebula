@@ -5,6 +5,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "iconUrl" TEXT,
+    "bio" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -26,13 +27,12 @@ CREATE TABLE "Article" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "excerpt" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
     "categoryId" TEXT NOT NULL,
     "tags" TEXT[],
-    "mongoId" TEXT NOT NULL,
+    "storagePath" TEXT NOT NULL,
 
     CONSTRAINT "Article_pkey" PRIMARY KEY ("id")
 );
@@ -42,9 +42,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Article_mongoId_key" ON "Article"("mongoId");
 
 -- AddForeignKey
 ALTER TABLE "Article" ADD CONSTRAINT "Article_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
