@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const take = parseInt(searchParams.get('take') || '5');
-    const skip = parseInt(searchParams.get('skip') || '0');
   
     try {
       const articles = await prisma.$queryRawUnsafe<
@@ -14,12 +13,12 @@ export async function GET(req: NextRequest) {
           title: string;
           excerpt: string;
           createdAt: Date;
-          mongoId: string;
+          storagePath: string;
           userId: string;
           categoryId: string;
         }[]
       >(
-        `SELECT "id", "title", "excerpt", "createdAt", "mongoId", "userId", "categoryId"
+        `SELECT "id", "title", "excerpt", "createdAt", "storagePath", "userId", "categoryId"
         FROM "Article"
         ORDER BY RANDOM()
         LIMIT ${take}`

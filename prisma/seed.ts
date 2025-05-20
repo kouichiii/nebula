@@ -1,21 +1,22 @@
 import { PrismaClient } from '@prisma/client';
-import { MongoClient } from 'mongodb';
+import { createClient } from '@supabase/supabase-js';
 import { hash } from 'bcryptjs';
 import fs from 'fs/promises';
 import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config(); // ← 必須！
 
 const prisma = new PrismaClient();
-const mongoClient = new MongoClient(process.env.MONGODB_URI!);
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 async function main() {
   // 既存データ削除
   await prisma.article.deleteMany();
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
-
-  await mongoClient.connect();
-  const db = mongoClient.db('nebula');
-  const articleCollection = db.collection('articles');
 
   // JSON 読み込み
   const usersPath = path.join(__dirname, 'seed-data', 'users.json');
@@ -63,27 +64,35 @@ async function main() {
     categoryMap[category] = createdCategory.id;
   }
 
-  // 記事作成（MongoDB + Prisma）
+  // 記事作成
   for (const article of articles) {
-    const mongoRes = await articleCollection.insertOne({
-      content: article.content,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    const fileName = `articles/${Date.now()}_${Math.random().toString(36).slice(2)}.txt`;
+    const contentBuffer = Buffer.from(article.content, 'utf-8');
+
+    const { error } = await supabase.storage
+      .from('articles')
+      .upload(fileName, contentBuffer, {
+        contentType: 'text/plain',
+        upsert: true,
+      });
+
+    if (error) {
+      console.error('❌ Upload Error:', error);
+      throw error;
+    }
 
     await prisma.article.create({
       data: {
         title: article.title,
         excerpt: article.excerpt,
-        mongoId: mongoRes.insertedId.toString(),
+        storagePath: fileName,
         userId: userMap[article.authorEmail],
         categoryId: categoryMap[article.category],
         tags: article.tags || [],
       },
     });
+    console.log(`✅ Users: ${users.length}, Articles: ${articles.length}`);
   }
-
-  console.log(`✅ Users: ${users.length}, Articles: ${articles.length}`);
 }
 
 main()
@@ -92,6 +101,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await mongoClient.close();
     await prisma.$disconnect();
   });

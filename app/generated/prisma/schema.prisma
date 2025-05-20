@@ -31,5 +31,4 @@ model Article {
   createdAt DateTime @default(now())
   category  String
   tags      String[]
-  // 本文はMongoDBで管理
 }

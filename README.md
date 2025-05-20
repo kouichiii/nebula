@@ -2,22 +2,14 @@
 
 ## ローカルセットアップ方法
 
-
 npm i
 
-docker compose up -d
+npx supabase init
 
-npx prisma migrate dev --name init
+supabase start
 
 npx prisma db seed
 
 
 サーバー立ち上げ
 npm run dev
-
-
-データベース確認
-npx prisma studio
-
-記事データ確認
-http/localhost:8081

@@ -1,27 +1,11 @@
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
+import supabase from '@/lib/supabase';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import { getServerSession } from 'next-auth';
 
-const uri = process.env.MONGODB_URI!;
-const client = new MongoClient(uri);
-
 export async function POST(req: Request) {
   try {
-    const { title, excerpt, content, categoryId, tags } = await req.json();
-    if (!title || !content || !categoryId) {
-      return NextResponse.json({ message: '必要な項目が足りません' }, { status: 400 });
-    }
-
-    await client.connect();
-    const db = client.db('nebula');
-    const mongoResult = await db.collection('articles').insertOne({
-      content,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
 
@@ -29,23 +13,40 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'ユーザーが認証されていません' }, { status: 401 });
     }
 
-    const rdbArticle = await prisma.article.create({
+    const { title, excerpt, content, categoryId, tags } = await req.json();
+    if (!title || !content || !categoryId) {
+      return NextResponse.json({ message: '必要な項目が足りません' }, { status: 400 });
+    }
+
+    const fileName = `articles/${Date.now()}_${Math.random().toString(36).slice(2)}.txt`;
+    const contentBuffer = Buffer.from(content, 'utf-8');
+
+    const { error } = await supabase.storage
+      .from('articles')
+      .upload(fileName, contentBuffer, {
+        contentType: 'text/plain',
+        upsert: true,
+      });
+
+    if (error) {
+      console.error('❌ Upload Error:', error);
+      throw error;
+    }
+
+    const created = await prisma.article.create({
       data: {
-        title,
-        excerpt,
-        categoryId,
-        tags,
-        mongoId: mongoResult.insertedId.toString(),
-        userId,
+        title: title,
+        excerpt: excerpt,
+        storagePath: fileName,
+        userId: userId,
+        categoryId: categoryId,
+        tags: tags || [],
       },
     });
-
-    return NextResponse.json({ id: rdbArticle.id }, { status: 201 });
+    return NextResponse.json({ id: created.id }, { status: 201 });
   } catch (err) {
     console.error('記事投稿エラー:', err);
     return NextResponse.json({ message: '投稿に失敗したちゃむ' }, { status: 500 });
-  } finally {
-    await client.close();
   }
 }
 
@@ -94,7 +95,7 @@ export async function GET(request: Request) {
         title: true,
         excerpt: true,
         tags: true,
-        mongoId: true,
+        storagePath: true,
         createdAt: true,
         user: {
           select: {

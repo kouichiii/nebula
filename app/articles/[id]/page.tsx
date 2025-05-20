@@ -1,9 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { MongoClient, ObjectId } from 'mongodb';
+import supabase from '@/lib/supabase';
 import ArticleContent from '@/app/articles/components/ArticleContent';
-
-const uri = process.env.MONGODB_URI!;
-const client = new MongoClient(uri);
 
 interface ArticlePageProps {
   params: { id: string };
@@ -18,7 +15,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       title: true,
       excerpt: true,
       tags: true,
-      mongoId: true,
+      storagePath: true,
       createdAt: true,
       user: { select: { name: true } },
     },
@@ -26,13 +23,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   if (!article) return <p>記事が見つかりませんでした。</p>;
 
-  await client.connect();
-  const db = client.db('nebula');
-  const mongoData = await db.collection('articles').findOne({
-    _id: new ObjectId(article.mongoId),
-  });
-
-  const content = mongoData?.content || '';
+  const data = await supabase.storage
+    .from('articles')
+    .download(article.storagePath);
+  if (!data) return <p>記事のデータが見つかりませんでした。</p>;
+  const { data: fileData, error } = data;
+  if (error) {
+    console.error('Error downloading file:', error);
+    return <p>記事のデータを取得できませんでした。</p>;
+  }
+  const content = await fileData.text();
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">

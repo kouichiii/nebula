@@ -43,7 +43,7 @@ model Article {
   userId     String
   categoryId String
   tags       String[]
-  mongoId    String    @unique
+  storagePath  String  
   user       User      @relation(fields: [userId], references: [id])
   category   Category  @relation(fields: [categoryId], references: [id])
 }
