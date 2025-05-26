@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useSpring, animated as a } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 import { ArticleCard } from 'next-auth';
@@ -34,6 +35,21 @@ export default function SwipeCard({
 
     api.start({ x: down ? mx : 0, rotate: down ? mx / 20 : 0, opacity: 1 });
   });
+
+  useEffect(() => {
+    if (!isFront) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        onSwipe('left');
+      } else if (e.key === 'ArrowRight') {
+        onSwipe('right');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFront, onSwipe]);
 
   return (
     <a.div

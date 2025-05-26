@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import supabase from '@/lib/supabase';
 import ArticleContent from '@/app/articles/components/ArticleContent';
+import { generateTableOfContents } from '@/lib/utils/tableOfContents';
+import TableOfContents from '../components/TableOfContents';
 
 interface ArticlePageProps {
   params: { id: string };
@@ -33,6 +35,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     return <p>記事のデータを取得できませんでした。</p>;
   }
   const content = await fileData.text();
+  const tocItems = generateTableOfContents(content);
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
@@ -45,6 +48,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <span key={tag} className="mr-2">#{tag}</span>
         ))}
       </div>
+      <TableOfContents items={tocItems} />
       <ArticleContent content={content} />
     </div>
   );

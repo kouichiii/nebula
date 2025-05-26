@@ -38,7 +38,44 @@ export default function SwipePage() {
   }, [index, articles.length]);
 
   if (!articles[index]) {
-    return <div className="text-center p-10">読み込み中...</div>;
+    return <div className="relative h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
+      {/* 左マーク（記事を開く） */}
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-200">
+        <FaExpandAlt size={36} title="記事を開く" />
+      </div>
+
+      {/* 右マーク（スキップ） */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-200">
+        <FaTrashAlt size={36} title="スキップ" />
+      </div>
+
+      {/* スケルトンカード */}
+      <div className="w-[320px] h-[480px] bg-white rounded-xl shadow-lg p-6 animate-pulse">
+        {/* ユーザー情報 */}
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-10 h-10 bg-gray-200 rounded-full" />
+          <div className="h-4 w-24 bg-gray-200 rounded" />
+        </div>
+
+        {/* タイトル */}
+        <div className="space-y-2 mb-4">
+          <div className="h-6 w-3/4 bg-gray-200 rounded" />
+          <div className="h-6 w-1/2 bg-gray-200 rounded" />
+        </div>
+
+        {/* 本文プレビュー */}
+        <div className="space-y-2">
+          <div className="h-4 w-full bg-gray-100 rounded" />
+          <div className="h-4 w-11/12 bg-gray-100 rounded" />
+          <div className="h-4 w-4/5 bg-gray-100 rounded" />
+        </div>
+
+        {/* カテゴリー */}
+        <div className="absolute bottom-6 left-6">
+          <div className="h-6 w-20 bg-purple-100 rounded-full" />
+        </div>
+      </div>
+    </div>;
   }
 
   return (

@@ -58,7 +58,6 @@ export default async function ProfilePage() {
             <div className="flex-grow space-y-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">{user.name}</h1>
-                <p className="text-purple-600 text-sm">@{session.user.id}</p>
                 {user.bio ? (
                   <p className="mt-2 text-gray-700 whitespace-pre-wrap">{user.bio}</p>
                 ) : (
