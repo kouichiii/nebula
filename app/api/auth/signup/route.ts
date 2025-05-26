@@ -12,11 +12,6 @@ export async function POST(request: Request) {
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          username,
-        },
-      },
     });
 
     if (signUpError) {
