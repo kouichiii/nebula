@@ -6,10 +6,8 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export default async function Sidebar() {
   const supabase = createServerSupabaseClient();
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData?.user?.id;
 
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 fixed left-0 top-0 flex flex-col">
@@ -41,7 +39,7 @@ export default async function Sidebar() {
           <span className="mx-3">検索する</span>
         </Link>
 
-        {session && (
+        {userId && (
           <Link
             href="/articles/new"
             className="flex items-center px-6 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
@@ -52,11 +50,11 @@ export default async function Sidebar() {
       </nav>
 
       <div className="p-6 border-t border-gray-200">
-        { session ? (
+        { userId ? (
           // ✅ セッションがあるときの本来の表示
           <div className="space-y-4">
             <div className="space-y-4">
-              <SmallProfile userId={session.user.id} />
+              <SmallProfile userId={userId} />
               <LogoutButton />
             </div>
           </div>

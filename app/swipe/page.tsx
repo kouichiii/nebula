@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SwipeCard from './components/SwipeCard';
-import { ArticleCard } from 'next-auth';
 import { FaExpandAlt, FaTrashAlt } from 'react-icons/fa';
 
 interface Article {
@@ -96,7 +95,13 @@ export default function SwipePage() {
         return (
           <SwipeCard
             key={article.id}
-            article={article as ArticleCard}
+            article={{
+              ...article,
+              user: {
+                ...article.user,
+                iconUrl: article.user.iconUrl === null ? undefined : article.user.iconUrl,
+              },
+            }}
             onSwipe={(dir) => {
               if (dir === 'right') {
                 setIndex((prev) => prev + 1);
