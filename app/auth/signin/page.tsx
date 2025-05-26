@@ -29,11 +29,11 @@ export default function SignInPage() {
         setError('ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。');
         return;
       }
+      window.location.href = '/';
     } catch (error) {
       setError('ログイン中にエラーが発生しました。');
     } finally {
       setIsLoading(false);
-      window.location.href = '/';
     }
   };
 

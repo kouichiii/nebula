@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import supabase from '@/lib/supabase';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function SignUpPage() {
     }
 
     try {
+      // 新規ユーザー登録
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -49,14 +51,26 @@ export default function SignUpPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || 'エラーが発生しました');
+        throw new Error(data.message);
       }
+
+      // 登録後の自動ログイン
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (signInError) {
+        throw new Error('ログインに失敗しました');
+      }
+
+      router.push('/');
+      router.refresh();
+
     } catch (error) {
       setError(error instanceof Error ? error.message : 'エラーが発生しました');
     } finally {
       setIsLoading(false);
-      router.push('/');
-      router.refresh();
     }
   };
 
