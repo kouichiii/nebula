@@ -15,9 +15,9 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
+  id        String    @id
   email     String    @unique
+  name      String?
   iconUrl   String?
   bio       String?
   createdAt DateTime  @default(now())
