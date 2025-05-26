@@ -22,9 +22,9 @@ export default function ProfileEditPage() {
         const res = await fetch('/api/profile');
         if (!res.ok) throw new Error('ユーザー情報の取得に失敗しました');
         const data = await res.json();
-        setName(data.name || '');
-        setIconUrl(data.iconUrl || '');
-        setBio(data.bio || '');
+        setName(data.user.name || '');
+        setIconUrl(data.user.iconUrl || '');
+        setBio(data.user.bio || '');
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -43,20 +43,20 @@ export default function ProfileEditPage() {
     try {
       let finalIconUrl = iconUrl;
       if (selectedFile) {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
+        const formData = new FormData();
+        formData.append('file', selectedFile);
 
-      const uploadRes = await fetch('/api/profile/upload', {
-        method: 'POST',
-        body: formData,
-      });
+        const uploadRes = await fetch('/api/profile/upload', {
+          method: 'POST',
+          body: formData,
+        });
 
-      const uploadData = await uploadRes.json();
-      if (!uploadRes.ok) {
-        throw new Error(uploadData.message || '画像アップロードに失敗しました');
-      }
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) {
+          throw new Error(uploadData.message || '画像アップロードに失敗しました');
+        }
 
-      finalIconUrl = uploadData.url;
+        finalIconUrl = uploadData.url;
       }
       
       const res = await fetch('/api/profile', {

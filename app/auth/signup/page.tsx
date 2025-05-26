@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -13,8 +12,8 @@ export default function SignUpPage() {
     password: '',
     confirmPassword: '',
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,7 +35,7 @@ export default function SignUpPage() {
     }
 
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,30 +49,14 @@ export default function SignUpPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || '登録に失敗しました。');
+        throw new Error(data.message || 'エラーが発生しました');
       }
-
-      router.push('/');
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError('登録中にエラーが発生しました。');
-      }
+      setError(error instanceof Error ? error.message : 'エラーが発生しました');
     } finally {
-      try {
-        const result = await signIn('credentials', {
-          email: formData.email,
-          password: formData.password,
-          redirect: false,
-          callbackUrl: '/'
-        });
-      } catch (error) {
-        setError('登録はできましたがログインに失敗しました。時間をおいてから再度ログインしてください。');
-      } finally {
-        setIsLoading(false);
-        router.refresh();
-      }
+      setIsLoading(false);
+      router.push('/');
+      router.refresh();
     }
   };
 
@@ -85,7 +68,7 @@ export default function SignUpPage() {
           <p className="text-gray-600">新規アカウント登録</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -178,4 +161,4 @@ export default function SignUpPage() {
       </div>
     </div>
   );
-} 
+}

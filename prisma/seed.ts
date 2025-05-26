@@ -43,12 +43,10 @@ async function main() {
   // ユーザー作成
   const userMap: Record<string, string> = {};
   for (const user of users) {
-    const hashedPassword = await hash(user.password, 12);
     const createdUser = await prisma.user.create({
       data: {
         name: user.name,
         email: user.email,
-        password: hashedPassword,
       },
     });
     userMap[user.email] = createdUser.id;

@@ -1,44 +1,38 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import { prisma } from '@/lib/prisma';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
-// GET: 現在のユーザー情報を取得
 export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
-    const userId = session?.user?.id;
+  const supabase = createServerComponentClient({ cookies });
 
-    if (!userId) {
-      return NextResponse.json({ message: '未認証です' }, { status: 401 });
-    }
+  const { data: { user } } = await supabase.auth.getUser()
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        name: true,
-        email: true,
-        iconUrl: true,
-        bio: true,
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json({ message: 'ユーザーが見つかりません' }, { status: 404 });
-    }
-
-    return NextResponse.json(user);
-  } catch (error) {
-    console.error('Profile GET Error:', error);
-    return NextResponse.json({ message: 'サーバーエラーが発生しました' }, { status: 500 });
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  const profile = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      id: true,
+      name: true,
+      iconUrl: true,
+      bio: true,
+    },
+  });
+
+  return NextResponse.json({
+    message: 'Authenticated',
+    user: profile,
+  });
 }
 
-// PUT: ユーザー情報を更新
 export async function PUT(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = session?.user?.id;
+    const supabase = createServerComponentClient({ cookies });
+    const userId = await supabase.auth.getUser()
+      .then(({ data }) => data.user?.id);
 
     if (!userId) {
       return NextResponse.json({ message: '未認証です' }, { status: 401 });
@@ -59,10 +53,6 @@ export async function PUT(req: Request) {
       return NextResponse.json({ message: 'プロフィールは1000文字以内で入力してください' }, { status: 400 });
     }
 
-    if (iconUrl && !isValidUrl(iconUrl)) {
-      return NextResponse.json({ message: '不正なURLです' }, { status: 400 });
-    }
-
     const updated = await prisma.user.update({
       where: { id: userId },
       data: {
@@ -76,7 +66,7 @@ export async function PUT(req: Request) {
         bio: true,
       },
     });
-    
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error('Profile PUT Error:', error);
@@ -84,12 +74,3 @@ export async function PUT(req: Request) {
   }
 }
 
-// URLバリデーション用のヘルパー関数
-function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}

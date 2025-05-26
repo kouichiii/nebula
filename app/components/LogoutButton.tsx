@@ -1,11 +1,22 @@
 // components/LogoutButton.tsx
 'use client';
 
-import { signOut } from 'next-auth/react';
+import supabase from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
 export default function LogoutButton() {
   const router = useRouter();
+  const signOut = async ({ callbackUrl }: { callbackUrl: string }) => {
+    try {
+    let { error } = await supabase.auth.signOut()
+      router.push(callbackUrl);
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally
+    {
+      router.refresh();
+    }
+  }
   return (
     <button
       onClick={() => {

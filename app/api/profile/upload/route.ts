@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
-import supabase from '@/lib/supabase';
 import sharp from 'sharp';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = session?.user?.id;
+    const supabase = createServerComponentClient({ cookies });
+    const userId = await supabase.auth.getUser()
+      .then(({ data }) => data.user?.id)
 
     if (!userId) {
       return NextResponse.json(

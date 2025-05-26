@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
-import supabase from '@/lib/supabase';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
-import { getServerSession } from 'next-auth';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = session?.user?.id;
+    const supabase = createServerComponentClient({ cookies });
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id;
 
     if (!userId) {
       return NextResponse.json({ message: 'ユーザーが認証されていません' }, { status: 401 });

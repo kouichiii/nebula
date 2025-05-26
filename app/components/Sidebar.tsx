@@ -1,12 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
 import SmallProfile from './SmallProfile';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import LogoutButton from './LogoutButton';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export default async function Sidebar() {
-  const session = await getServerSession(authOptions);
+  const supabase = createServerSupabaseClient();
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 fixed left-0 top-0 flex flex-col">

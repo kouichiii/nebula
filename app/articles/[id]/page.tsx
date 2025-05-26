@@ -8,8 +8,6 @@ import ArticleContent from '@/app/articles/components/ArticleContent';
 import { generateTableOfContents } from '@/lib/utils/tableOfContents';
 import TableOfContents from '../components/TableOfContents';
 import LikeButton from '../components/LikeButton';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
 
 interface ArticlePageProps {
   params: { id: string };
@@ -37,7 +35,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { id } = params;
-  const session = await getServerSession(authOptions);
+  const session = await supabase.auth.getSession().then(({ data }) => data.session);
 
   const article = await prisma.article.findUnique({
     where: { id },

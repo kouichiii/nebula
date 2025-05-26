@@ -1,17 +1,18 @@
-import { getServerSession, Session } from 'next-auth';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export default async function ProfilePage() {
-  const session: Session | null = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const supabase = createServerSupabaseClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData?.user?.id;
+
+  if (!userId) {
     redirect('/auth/signin'); // 未ログインはログイン画面へ
   }
-
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: userId },
     select: {
       name: true,
       iconUrl: true,

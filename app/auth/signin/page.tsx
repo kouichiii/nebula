@@ -4,12 +4,11 @@ import React, { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import supabase from '@/lib/supabase';
 
 export default function SignInPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const returnUrl = searchParams?.get('returnUrl');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,40 +21,20 @@ export default function SignInPage() {
     setError('');
 
     try {
-      const result = await signIn('credentials', {
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        redirect: false,
-        callbackUrl: '/'
       });
-
-      if (result?.error) {
-        setError('メールアドレスまたはパスワードが正しくありません。');
-      } else if (result?.url) {
-        router.push(result.url);
+      if (error) {
+        console.error('Supabase signIn error:', error);
+        setError('ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。');
+        return;
       }
     } catch (error) {
       setError('ログイン中にエラーが発生しました。');
     } finally {
       setIsLoading(false);
-      router.refresh();
-    }
-  };
-
-  const handleLogin = async () => {
-    try {
-      const result = await signIn('credentials', {
-        redirect: false,
-        // ...他の認証情報
-      });
-
-      if (result?.ok) {
-        // ログイン成功時、元のページに戻る
-        router.push(returnUrl || '/');
-        router.refresh();
-      }
-    } catch (error) {
-      console.error('Login error:', error);
+      window.location.href = '/';
     }
   };
 
@@ -68,28 +47,6 @@ export default function SignInPage() {
         </div>
 
         <div className="mt-8 space-y-4">
-          <button
-            onClick={() => signIn('google', { callbackUrl: '/' })}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
-          >
-            <Image
-              src="/google.svg"
-              alt="Google"
-              width={20}
-              height={20}
-              className="w-5 h-5"
-            />
-            <span>Googleでログイン</span>
-          </button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">または</span>
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

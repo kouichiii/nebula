@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { use } from 'react';
 
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const supabase = createServerComponentClient({ cookies });
+    const userId = await supabase.auth.getUser()
+      .then(({ data }) => data.user?.id);
+      
+    if (!userId) {
       return NextResponse.json(
         { message: 'ログインが必要です' },
         { status: 401 }
@@ -34,7 +38,7 @@ export async function POST(
     const existingLike = await prisma.like.findUnique({
       where: {
         userId_articleId: {
-          userId: session.user.id,
+          userId: userId,
           articleId,
         },
       },
@@ -56,7 +60,7 @@ export async function POST(
     // いいね追加
     await prisma.like.create({
       data: {
-        userId: session.user.id,
+        userId: userId,
         articleId,
       },
     });
