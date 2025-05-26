@@ -4,10 +4,13 @@ import React, { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function SignInPage() {
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const returnUrl = searchParams?.get('returnUrl');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +39,23 @@ export default function SignInPage() {
     } finally {
       setIsLoading(false);
       router.refresh();
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        // ...他の認証情報
+      });
+
+      if (result?.ok) {
+        // ログイン成功時、元のページに戻る
+        router.push(returnUrl || '/');
+        router.refresh();
+      }
+    } catch (error) {
+      console.error('Login error:', error);
     }
   };
 
@@ -136,4 +156,4 @@ export default function SignInPage() {
       </div>
     </div>
   );
-} 
+}

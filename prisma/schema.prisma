@@ -24,6 +24,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   articles  Article[]
+  likes     Like[]
 }
 
 model Category {
@@ -46,4 +47,18 @@ model Article {
   storagePath  String  
   user       User      @relation(fields: [userId], references: [id])
   category   Category  @relation(fields: [categoryId], references: [id])
+  likes     Like[]
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id])
+
+  @@unique([userId, articleId])
+  @@index([articleId])
+  @@index([userId])
 }
