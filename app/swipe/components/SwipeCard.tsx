@@ -3,7 +3,17 @@
 import { useEffect } from 'react';
 import { useSpring, animated as a } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
-import { ArticleCard } from 'next-auth';
+type ArticleCard = {
+  user: {
+    iconUrl?: string;
+    name: string;
+  };
+  category: {
+    name: string;
+  };
+  title: string;
+  excerpt: string;
+};
 
 export default function SwipeCard({
   article,
