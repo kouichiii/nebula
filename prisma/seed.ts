@@ -43,8 +43,22 @@ async function main() {
   // ユーザー作成
   const userMap: Record<string, string> = {};
   for (const user of users) {
+    // まずSupabaseでユーザーを作成
+    const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
+      email: user.email,
+      password: user.password,
+      email_confirm: true
+    });
+
+    if (signUpError || !authData.user) {
+      console.error('❌ Supabase User Creation Error:', signUpError);
+      continue;
+    }
+
+    // 次にPrismaでユーザーを作成
     const createdUser = await prisma.user.create({
       data: {
+        id: authData.user.id,
         name: user.name,
         email: user.email,
       },
