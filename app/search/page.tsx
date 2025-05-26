@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SearchResultCard, { Article } from './components/SearchResultCard';
 
@@ -61,52 +61,54 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">検索する</h1>
+    <Suspense fallback={<div className="text-center p-6">読み込み中...</div>}>
+      <div className="max-w-3xl mx-auto p-6">
+        <h1 className="text-3xl font-bold mb-4">検索する</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex">
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="キーワードを入力"
-            className="flex-1 border rounded-l px-4 py-2"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-purple-600 text-white px-4 rounded-r"
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex">
+            <input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="キーワードを入力"
+              className="flex-1 border rounded-l px-4 py-2"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-purple-600 text-white px-4 rounded-r"
+            >
+              {loading ? '検索中…' : '検索'}
+            </button>
+          </div>
+
+          <label className="block font-medium">カテゴリ</label>
+
+          <select
+            value={categoryId}
+            onChange={e => setCategoryId(e.target.value)}
+            className="border rounded px-4 py-2"
           >
-            {loading ? '検索中…' : '検索'}
-          </button>
-        </div>
+            <option value="">すべてのカテゴリ</option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
 
-        <label className="block font-medium">カテゴリ</label>
+        </form>
 
-        <select
-          value={categoryId}
-          onChange={e => setCategoryId(e.target.value)}
-          className="border rounded px-4 py-2"
-        >
-          <option value="">すべてのカテゴリ</option>
-          {categories.map(c => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
 
-      </form>
+        {!loading && results.length > 0 && (
+          <ul className="space-y-4">
+            {results.map(a => <SearchResultCard key={a.id} article={a} />)}
+          </ul>
+        )}
 
-      {error && <p className="text-red-600 mb-4">{error}</p>}
-
-      {!loading && results.length > 0 && (
-        <ul className="space-y-4">
-          {results.map(a => <SearchResultCard key={a.id} article={a} />)}
-        </ul>
-      )}
-
-      {!loading && !error && initialQ && results.length === 0 && (
-        <p>該当する記事が見つかりませんでした。</p>
-      )}
-    </div>
+        {!loading && !error && initialQ && results.length === 0 && (
+          <p>該当する記事が見つかりませんでした。</p>
+        )}
+      </div>
+    </Suspense>
   );
 }
