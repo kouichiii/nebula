@@ -37,82 +37,171 @@ export default function SwipePage() {
   }, [index, articles.length]);
 
   if (!articles[index]) {
-    return <div className="relative h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
-      {/* 左マーク（記事を開く） */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-200">
-        <FaExpandAlt size={36} title="記事を開く" />
+    return (
+      <div className="min-h-screen relative bg-gradient-to-br from-purple-50 via-white to-pink-50 overflow-hidden">
+        {/* 背景デコレーション */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-200/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl animate-pulse" />
+        </div>
+
+        {/* スワイプインジケーター */}
+        <div className="absolute inset-x-0 top-8 flex justify-center space-x-8 text-sm font-medium">
+          <div className="flex items-center space-x-2 text-purple-400">
+            <FaExpandAlt className="w-5 h-5" />
+            <span>左にスワイプして記事を読む</span>
+          </div>
+          <div className="flex items-center space-x-2 text-gray-400">
+            <FaTrashAlt className="w-5 h-5" />
+            <span>右にスワイプしてスキップ</span>
+          </div>
+        </div>
+
+        <div className="relative h-screen flex items-center justify-center">
+          {/* 左右のアクションインジケーター - フェード効果付き */}
+          <div className="absolute left-8 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-purple-500/20 animate-pulse">
+            <FaExpandAlt size={48} />
+            <div className="h-1 w-32 bg-purple-500/20 rounded-full" />
+          </div>
+          <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500/20 animate-pulse">
+            <div className="h-1 w-32 bg-gray-500/20 rounded-full" />
+            <FaTrashAlt size={48} />
+          </div>
+
+          {/* スケルトンカード */}
+          <div className="w-[400px] h-[600px] bg-white/80 backdrop-blur-sm rounded-2xl p-8 
+            shadow-xl border border-gray-100/50 animate-pulse">
+            <div className="h-full flex flex-col">
+              {/* ユーザー情報 */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-200/50 to-pink-200/50 rounded-full" />
+                <div className="space-y-2">
+                  <div className="h-4 w-24 bg-purple-100/50 rounded-full" />
+                  <div className="h-3 w-20 bg-gray-100/50 rounded-full" />
+                </div>
+              </div>
+
+              {/* タイトル */}
+              <div className="space-y-3 mb-6">
+                <div className="h-8 w-3/4 bg-purple-100/50 rounded-xl" />
+                <div className="h-8 w-1/2 bg-purple-100/50 rounded-xl" />
+              </div>
+
+              {/* 本文プレビュー */}
+              <div className="flex-grow space-y-3">
+                <div className="h-4 w-full bg-gray-100/50 rounded-full" />
+                <div className="h-4 w-11/12 bg-gray-100/50 rounded-full" />
+                <div className="h-4 w-full bg-gray-100/50 rounded-full" />
+                <div className="h-4 w-10/12 bg-gray-100/50 rounded-full" />
+                <div className="h-4 w-9/12 bg-gray-100/50 rounded-full" />
+              </div>
+
+              {/* アクションインジケーター */}
+              <div className="flex justify-between text-sm font-medium mt-6">
+                <div className="h-4 w-24 bg-purple-100/50 rounded-full" />
+                <div className="h-4 w-20 bg-gray-100/50 rounded-full" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* 右マーク（スキップ） */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-200">
-        <FaTrashAlt size={36} title="スキップ" />
-      </div>
-
-      {/* スケルトンカード */}
-      <div className="w-[320px] h-[480px] bg-white rounded-xl shadow-lg p-6 animate-pulse">
-        {/* ユーザー情報 */}
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-10 h-10 bg-gray-200 rounded-full" />
-          <div className="h-4 w-24 bg-gray-200 rounded" />
-        </div>
-
-        {/* タイトル */}
-        <div className="space-y-2 mb-4">
-          <div className="h-6 w-3/4 bg-gray-200 rounded" />
-          <div className="h-6 w-1/2 bg-gray-200 rounded" />
-        </div>
-
-        {/* 本文プレビュー */}
-        <div className="space-y-2">
-          <div className="h-4 w-full bg-gray-100 rounded" />
-          <div className="h-4 w-11/12 bg-gray-100 rounded" />
-          <div className="h-4 w-4/5 bg-gray-100 rounded" />
-        </div>
-
-        {/* カテゴリー */}
-        <div className="absolute bottom-6 left-6">
-          <div className="h-6 w-20 bg-purple-100 rounded-full" />
-        </div>
-      </div>
-    </div>;
+    );
   }
 
   return (
-    <div className="relative h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
-      {/* 左マーク（記事を開く） */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-500 opacity-50">
-        <FaExpandAlt size={36} title="記事を開く" />
+    <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 overflow-hidden">
+      {/* 背景デコレーション */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-200/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl" />
       </div>
 
-      {/* 右マーク（スキップ） */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 opacity-50">
-        <FaTrashAlt size={36} title="スキップ" />
+      {/* スワイプインジケーター */}
+      <div className="absolute inset-x-0 top-8 flex justify-center space-x-8 text-sm font-medium">
+        <div className="flex items-center space-x-2 text-purple-600">
+          <FaExpandAlt className="w-5 h-5" />
+          <span>左にスワイプして記事を読む</span>
+        </div>
+        <div className="flex items-center space-x-2 text-gray-500">
+          <FaTrashAlt className="w-5 h-5" />
+          <span>右にスワイプしてスキップ</span>
+        </div>
       </div>
 
-      {/* スワイプカード */}
-      {articles.slice(index, index + 2).map((article, i) => {
-        const isFront = i === 0;
-        return (
-          <SwipeCard
-            key={article.id}
-            article={{
-              ...article,
-              user: {
-                ...article.user,
-                iconUrl: article.user.iconUrl === null ? undefined : article.user.iconUrl,
-              },
-            }}
-            onSwipe={(dir) => {
-              if (dir === 'right') {
-                setIndex((prev) => prev + 1);
-              } else {
-                router.push(`/articles/${article.id}`);
-              }
-            }}
-            isFront={isFront}
-          />
-        );
-      })}
+      <div className="relative h-screen flex items-center justify-center">
+        {/* 左右のアクションインジケーター */}
+        <div className="absolute left-8 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-purple-500/20">
+          <FaExpandAlt size={48} />
+          <div className="h-1 w-32 bg-purple-500/20 rounded-full" />
+        </div>
+        <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-gray-500/20">
+          <div className="h-1 w-32 bg-gray-500/20 rounded-full" />
+          <FaTrashAlt size={48} />
+        </div>
+
+        {/* スケルトンローディング */}
+        {!articles[index] && (
+          <div className="w-[400px] h-[600px] bg-white/80 backdrop-blur-sm rounded-2xl p-8 
+            shadow-xl border border-gray-100/50 animate-pulse">
+            <div className="h-full flex flex-col">
+              {/* ユーザー情報 */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-200/50 to-pink-200/50 rounded-full" />
+                <div className="space-y-2">
+                  <div className="h-4 w-24 bg-purple-100/50 rounded-full" />
+                  <div className="h-3 w-20 bg-gray-100/50 rounded-full" />
+                </div>
+              </div>
+
+              {/* タイトル */}
+              <div className="space-y-3 mb-6">
+                <div className="h-8 w-3/4 bg-purple-100/50 rounded-xl" />
+                <div className="h-8 w-1/2 bg-purple-100/50 rounded-xl" />
+              </div>
+
+              {/* 本文プレビュー */}
+              <div className="flex-grow space-y-3">
+                <div className="h-4 w-full bg-gray-100/50 rounded-full" />
+                <div className="h-4 w-11/12 bg-gray-100/50 rounded-full" />
+                <div className="h-4 w-full bg-gray-100/50 rounded-full" />
+                <div className="h-4 w-10/12 bg-gray-100/50 rounded-full" />
+                <div className="h-4 w-9/12 bg-gray-100/50 rounded-full" />
+              </div>
+
+              {/* アクションインジケーター */}
+              <div className="flex justify-between text-sm font-medium mt-6">
+                <div className="h-4 w-24 bg-purple-100/50 rounded-full" />
+                <div className="h-4 w-20 bg-gray-100/50 rounded-full" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* スワイプカード */}
+        {articles.slice(index, index + 2).map((article, i) => {
+          const isFront = i === 0;
+          return (
+            <SwipeCard
+              key={article.id}
+              article={{
+                ...article,
+                user: {
+                  ...article.user,
+                  iconUrl: article.user.iconUrl === null ? undefined : article.user.iconUrl,
+                },
+              }}
+              onSwipe={(dir) => {
+                if (dir === 'right') {
+                  setIndex((prev) => prev + 1);
+                } else {
+                  router.push(`/articles/${article.id}`);
+                }
+              }}
+              isFront={isFront}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

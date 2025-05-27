@@ -27,8 +27,24 @@ export default function SwipeCard({
   const [{ x, rotate, opacity }, api] = useSpring(() => ({
     x: 0,
     rotate: 0,
-    opacity: 1
+    opacity: 1,
+    // スプリングの設定を追加
+    config: {
+      tension: 180,
+      friction: 12
+    }
   }));
+
+  // バックカード用のスプリングアニメーション
+  const backCardSpring = useSpring({
+    scale: isFront ? 1 : 0.95,
+    y: isFront ? 0 : 10,
+    opacity: isFront ? 1 : 0.8,
+    config: {
+      tension: 180,
+      friction: 12
+    }
+  });
 
   const bind = useDrag(({ down, movement: [mx], direction: [xDir], velocity }) => {
     if (!isFront) return;
@@ -67,27 +83,53 @@ export default function SwipeCard({
       style={{
         x,
         rotate,
-        opacity,
         touchAction: 'none',
-        zIndex: isFront ? 1 : 0 // フロントのカードだけ上に
+        zIndex: isFront ? 1 : 0,
+        ...backCardSpring, // バックカードのアニメーション適用
+        transformOrigin: 'top center',
       }}
-      className="absolute w-full max-w-xl h-[75vh] bg-white p-6 rounded-xl shadow-xl select-none"
+      className={`
+        absolute w-[400px] h-[600px] backdrop-blur-sm rounded-2xl p-8 
+        shadow-xl transition-shadow select-none border border-gray-100
+        ${isFront 
+          ? 'bg-white/90 hover:shadow-2xl' 
+          : 'bg-white/70'
+        }
+      `}
     >
-      <div className="flex items-center gap-3 mb-4">
-        {article.user.iconUrl ? (
-          <img src={article.user.iconUrl} alt={article.user.name} className="w-10 h-10 rounded-full" />
-        ) : (
-          <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center">
-            <span className="text-purple-600 font-bold text-lg">{article.user.name[0]}</span>
+      <div className="h-full flex flex-col">
+        {/* ユーザー情報 */}
+        <div className="flex items-center gap-3 mb-6">
+          {article.user.iconUrl ? (
+            <img
+              src={article.user.iconUrl}
+              alt={article.user.name}
+              className="w-12 h-12 rounded-full ring-2 ring-purple-100"
+            />
+          ) : (
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full 
+            flex items-center justify-center">
+              <span className="text-purple-600 font-bold text-xl">{article.user.name[0]}</span>
+            </div>
+          )}
+          <div>
+            <p className="font-medium text-gray-900">{article.user.name}</p>
+            <p className="text-sm text-purple-600">{article.category.name}</p>
           </div>
-        )}
-        <div>
-          <p className="font-medium text-gray-800">{article.user.name}</p>
-          <p className="text-sm text-gray-500">{article.category.name}</p>
+        </div>
+
+        {/* 記事タイトル */}
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{article.title}</h2>
+
+        {/* 記事プレビュー */}
+        <p className="text-gray-600 line-clamp-[12] flex-grow mb-6">{article.excerpt}</p>
+
+        {/* アクションインジケーター */}
+        <div className="flex justify-between text-sm font-medium">
+          <span className="text-purple-600">← 記事を読む</span>
+          <span className="text-gray-500">スキップ →</span>
         </div>
       </div>
-      <h2 className="text-xl font-semibold text-purple-700 mb-2">{article.title}</h2>
-      <p className="text-gray-600">{article.excerpt}</p>
     </a.div>
   );
 }

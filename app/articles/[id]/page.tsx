@@ -77,64 +77,97 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const tocItems = generateTableOfContents(content);
 
   return (
-    <article className="max-w-4xl mx-auto py-8 px-4">
-      {/* ヘッダー部分 */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            {/* 著者情報 */}
-            <div className="flex items-center">
-              {article.user.iconUrl && (
-                <img 
-                  src={article.user.iconUrl} 
-                  alt={article.user.name || '著者'} 
-                  className="w-8 h-8 rounded-full mr-2"
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+      <div className="max-w-[1400px] mx-auto py-12 px-4 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-8">
+          {/* メインカラム */}
+          <article>
+            {/* ヘッダー部分 */}
+            <header className="mb-12 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-sm">
+              <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                {article.title}
+              </h1>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center space-x-4">
+                  {/* 著者情報 */}
+                  <div className="flex items-center">
+                    {article.user.iconUrl ? (
+                      <img 
+                        src={article.user.iconUrl} 
+                        alt={article.user.name || '著者'} 
+                        className="w-12 h-12 rounded-full ring-2 ring-purple-100"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full 
+                      flex items-center justify-center">
+                        <span className="text-purple-600 font-bold text-xl">
+                          {article.user.name?.[0]}
+                        </span>
+                      </div>
+                    )}
+                    <div className="ml-3">
+                      <span className="block font-medium text-gray-900">{article.user.name}</span>
+                      <time className="text-sm text-gray-500">
+                        {new Date(article.createdAt).toLocaleDateString('ja-JP', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </time>
+                    </div>
+                  </div>
+                  {/* カテゴリ */}
+                  <span className="px-4 py-1.5 bg-purple-50 text-purple-600 rounded-full text-sm font-medium">
+                    {article.category.name}
+                  </span>
+                </div>
+                <LikeButton
+                  articleId={id}
+                  initialLiked={!!article.likes?.length}
+                  initialCount={article._count.likes}
+                  isAuthenticated={!!session}
                 />
-              )}
-              <span className="text-gray-600">{article.user.name}</span>
+              </div>
+
+              {/* タグ一覧 */}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {article.tags.map((tag) => (
+                  <span 
+                    key={tag} 
+                    className="inline-block bg-gray-50 text-gray-600 rounded-full px-4 py-1 text-sm 
+                    border border-gray-100 hover:bg-gray-100 transition-colors"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </header>
+
+            {/* 記事本文 */}
+            <div className="prose prose-lg prose-purple max-w-none bg-white/80 backdrop-blur-sm 
+              rounded-2xl p-8 shadow-sm">
+              <Suspense fallback={<LoadingSpinner />}>
+                <ArticleContent content={content} />
+              </Suspense>
             </div>
-            {/* 投稿日時 */}
-            <time className="text-gray-500 text-sm">
-              {new Date(article.createdAt).toLocaleDateString()}
-            </time>
-            {/* カテゴリ */}
-            <span className="text-purple-600 text-sm">
-              {article.category.name}
-            </span>
-          </div>
-          <LikeButton
-            articleId={id}
-            initialLiked={!!article.likes?.length}
-            initialCount={article._count.likes}
-            isAuthenticated={!!session}
-          />
+          </article>
+
+          {/* 目次 - 右サイドバー */}
+          <aside>
+            <div className="sticky top-8">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm">
+                <h2 className="text-lg font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 
+                  bg-clip-text text-transparent">
+                  目次
+                </h2>
+                <nav className="overflow-y-auto max-h-[calc(100vh-12rem)]">
+                  <TableOfContents items={tocItems} />
+                </nav>
+              </div>
+            </div>
+          </aside>
         </div>
-
-        {/* タグ一覧 */}
-        <div className="mt-4 space-x-2">
-          {article.tags.map((tag) => (
-            <span 
-              key={tag} 
-              className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-700"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      </header>
-
-      {/* 目次 - PC表示時のみ固定表示 */}
-      <div className="hidden lg:block fixed right-4 top-24 w-64">
-        <TableOfContents items={tocItems} />
       </div>
-
-      {/* 記事本文 */}
-      <div className="prose prose-purple max-w-none">
-        <Suspense fallback={<LoadingSpinner />}>
-          <ArticleContent content={content} />
-        </Suspense>
-      </div>
-    </article>
+    </div>
   );
 }

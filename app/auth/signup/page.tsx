@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import supabase from '@/lib/supabase';
+import { motion } from 'framer-motion';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -75,104 +76,102 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-pink-50">
+      {/* 背景アニメーション - サインインページと同じ */}
+      <div className="absolute inset-0 -z-10">
+        {/* ここに背景アニメーションのコードを挿入 */}
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md space-y-8 p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl my-8"
+      >
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-purple-600 mb-2">Nebula</h1>
-          <p className="text-gray-600">新規アカウント登録</p>
+          <motion.h1 
+            className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 bg-clip-text text-transparent"
+            animate={{ backgroundPosition: ["0%", "100%"] }}
+            transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
+            style={{ backgroundSize: "200%" }}
+          >
+            Nebula
+          </motion.h1>
+          <p className="text-gray-600">新しいアカウントを作成</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                ユーザー名
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                placeholder="username"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                メールアドレス
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                placeholder="example@example.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                パスワード
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                minLength={8}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                パスワード（確認）
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                minLength={8}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                placeholder="••••••••"
-              />
-            </div>
+            {/*
+              { id: 'username', label: 'ユーザー名', type: 'text', placeholder: 'username' },
+              { id: 'email', label: 'メールアドレス', type: 'email', placeholder: 'example@example.com' },
+              { id: 'password', label: 'パスワード', type: 'password', placeholder: '••••••••' },
+              { id: 'confirmPassword', label: 'パスワード（確認）', type: 'password', placeholder: '••••••••' }
+            */}
+            {['username', 'email', 'password', 'confirmPassword'].map((field, i) => (
+              <motion.div
+                key={field}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * i }}
+              >
+                <label htmlFor={field} className="block text-sm font-medium text-gray-700">
+                  {field === 'username' && 'ユーザー名'}
+                  {field === 'email' && 'メールアドレス'}
+                  {field === 'password' && 'パスワード'}
+                  {field === 'confirmPassword' && 'パスワード（確認）'}
+                </label>
+                <input
+                  type={field.includes('password') ? 'password' : 'text'}
+                  id={field}
+                  name={field}
+                  value={formData[field as keyof typeof formData]}
+                  onChange={handleChange}
+                  required
+                  minLength={field.includes('password') ? 8 : undefined}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm
+                  focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  placeholder={
+                    field === 'username' ? 'username' :
+                    field === 'email' ? 'example@example.com' :
+                    '••••••••'
+                  }
+                />
+              </motion.div>
+            ))}
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm">{error}</div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-red-600 text-sm bg-red-50 p-3 rounded-xl"
+            >
+              {error}
+            </motion.div>
           )}
 
-          <button
+          <motion.button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white 
+            rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 
+            disabled:cursor-not-allowed font-medium"
           >
             {isLoading ? '登録中...' : 'アカウントを作成'}
-          </button>
+          </motion.button>
 
           <div className="text-center text-sm">
             <p className="text-gray-600">
               すでにアカウントをお持ちの方は
-              <Link href="/auth/signin" className="text-purple-600 hover:text-purple-500">
+              <Link href="/auth/signin" className="text-purple-600 hover:text-purple-500 font-medium ml-1">
                 ログイン
               </Link>
             </p>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }
