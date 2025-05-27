@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { createClient } from '@supabase/supabase-js';
-import { hash } from 'bcryptjs';
 import fs from 'fs/promises';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -13,7 +12,16 @@ const supabase = createClient(
 );
 
 async function main() {
-  // JSON読み込み
+  console.log('🚀 Starting seed...');
+
+  // First, delete existing data
+  console.log('Cleaning up existing data...');
+  await prisma.article.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.mainCategory.deleteMany();
+  await prisma.user.deleteMany();
+
+  // Load seed data
   const usersPath = path.join(__dirname, 'seed-data', 'users.json');
   const articlesPath = path.join(__dirname, 'seed-data', 'articles.json');
   const categoriesPath = path.join(__dirname, 'seed-data', 'categories.json');
@@ -24,107 +32,116 @@ async function main() {
     fs.readFile(categoriesPath, 'utf-8'),
   ]);
 
-  const users = JSON.parse(usersData) as {
-    name: string;
-    email: string;
-    password: string;
-  }[];
+  // Parse JSON data
+  const users = JSON.parse(usersData);
+  const articles = JSON.parse(articlesData);
+  const categories = JSON.parse(categoriesData);
 
-  const articles = JSON.parse(articlesData) as {
-    title: string;
-    excerpt: string;
-    content: string;
-    category: string; // 小カテゴリ名
-    authorEmail: string;
-    tags?: string[];
-  }[];
-
-  const categories = JSON.parse(categoriesData) as {
-    main: string;
-    subs: string[];
-  }[];
-
-  // 削除（順序に注意）
-  await prisma.article.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.mainCategory.deleteMany();
-  await prisma.user.deleteMany();
-
-  // カテゴリ登録
+  // Create categories
+  console.log('Creating categories...');
   const categoryMap: Record<string, string> = {};
-
   for (const category of categories) {
     const main = await prisma.mainCategory.create({
       data: { name: category.main },
     });
 
     for (const sub of category.subs) {
-      const category = await prisma.category.create({
+      const created = await prisma.category.create({
         data: {
           name: sub,
           mainCategoryId: main.id,
         },
       });
-      categoryMap[sub] = category.id;
+      categoryMap[sub] = created.id;
     }
   }
 
-  // ユーザー登録
+  // Create users
+  console.log('Creating users...');
   const userMap: Record<string, string> = {};
-
   for (const user of users) {
-    const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
-      email: user.email,
-      password: user.password,
-      email_confirm: true,
-    });
-
-    if (signUpError || !authData.user) {
-      console.error('❌ Supabase User Creation Error:', signUpError);
-      continue;
-    }
-
-    const createdUser = await prisma.user.create({
-      data: {
-        id: authData.user.id,
-        name: user.name,
+    try {
+      const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
         email: user.email,
-      },
-    });
-
-    userMap[user.email] = createdUser.id;
-  }
-
-  // 記事登録
-  for (const article of articles) {
-    const fileName = `articles/${Date.now()}_${Math.random().toString(36).slice(2)}.txt`;
-    const contentBuffer = Buffer.from(article.content, 'utf-8');
-
-    const { error: uploadError } = await supabase.storage
-      .from('articles')
-      .upload(fileName, contentBuffer, {
-        contentType: 'text/plain',
-        upsert: true,
+        password: user.password,
+        email_confirm: true,
       });
 
-    if (uploadError) {
-      console.error('❌ Upload Error:', uploadError);
-      continue;
-    }
+      if (signUpError) {
+        console.error(`❌ Failed to create Supabase user ${user.email}:`, signUpError);
+        continue;
+      }
 
-    await prisma.article.create({
-      data: {
-        title: article.title,
-        excerpt: article.excerpt,
-        storagePath: fileName,
-        userId: userMap[article.authorEmail],
-        categoryId: categoryMap[article.category],
-        tags: article.tags || [],
-      },
-    });
+      if (!authData.user) {
+        console.error(`❌ No user data returned for ${user.email}`);
+        continue;
+      }
+
+      const createdUser = await prisma.user.create({
+        data: {
+          id: authData.user.id,
+          name: user.name,
+          email: user.email,
+        },
+      });
+
+      userMap[user.email] = createdUser.id;
+      console.log(`✅ Created user: ${user.email}`);
+    } catch (error) {
+      console.error(`❌ Error creating user ${user.email}:`, error);
+    }
   }
 
-  console.log(`✅ Seed completed: ${users.length} users, ${articles.length} articles`);
+  // Create articles
+  console.log('Creating articles...');
+  for (const article of articles) {
+    try {
+      const userId = userMap[article.authorEmail];
+      const categoryId = categoryMap[article.category];
+
+      if (!userId) {
+        console.error(`❌ No user found for email: ${article.authorEmail}`);
+        continue;
+      }
+
+      if (!categoryId) {
+        console.error(`❌ No category found: ${article.category}`);
+        continue;
+      }
+
+      const fileName = `articles/${Date.now()}_${Math.random().toString(36).slice(2)}.txt`;
+      const contentBuffer = Buffer.from(article.content, 'utf-8');
+
+      const { error: uploadError } = await supabase.storage
+        .from('articles')
+        .upload(fileName, contentBuffer, {
+          contentType: 'text/plain',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error('❌ Failed to upload article content:', uploadError);
+        continue;
+      }
+
+      await prisma.article.create({
+        data: {
+          title: article.title,
+          excerpt: article.excerpt,
+          storagePath: fileName,
+          userId,
+          categoryId,
+          tags: article.tags || [],
+        },
+      });
+
+      console.log(`✅ Created article: ${article.title}`);
+    } catch (error) {
+      console.error(`❌ Error creating article ${article.title}:`, error);
+    }
+  }
+
+  console.log('✨ Seed completed successfully!');
 }
 
 main()

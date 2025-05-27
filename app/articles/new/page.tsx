@@ -3,6 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import MarkdownEditor from '../components/MarkdownEditor';
+import { Category, MainCategory } from '@prisma/client';
+
+interface CategoryWithSubs extends MainCategory {
+  subCategories: Category[];
+}
 
 export default function NewArticlePage() {
   const router = useRouter();
@@ -10,7 +15,9 @@ export default function NewArticlePage() {
   const [excerpt, setExcerpt] = useState('');
   const [tags, setTags] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [categories, setCategories] = useState<any[]>([]);
+  const [mainCategories, setMainCategories] = useState<CategoryWithSubs[]>([]);
+  const [selectedMainCat, setSelectedMainCat] = useState('');
+  const [subCategories, setSubCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [body, setBody] = useState('# ここに本文を書きましょう\n\nマークダウン形式で記述できます。');
@@ -18,12 +25,19 @@ export default function NewArticlePage() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await fetch('/api/categories');
+      const res = await fetch('/api/categories/main');
       const data = await res.json();
-      setCategories(data);
+      setMainCategories(data);
     };
     fetchCategories();
   }, []);
+
+  const handleMainCategoryChange = (mainCatId: string) => {
+    setSelectedMainCat(mainCatId);
+    const selectedMain = mainCategories.find(cat => cat.id === mainCatId);
+    setSubCategories(selectedMain?.subCategories || []);
+    setCategoryId(''); // サブカテゴリをリセット
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,18 +123,39 @@ export default function NewArticlePage() {
                 />
               </div>
               <div>
-                <label className="block font-medium">カテゴリ</label>
-                <select
-                  className="w-full border rounded px-3 py-2"
-                  value={categoryId}
-                  onChange={e => setCategoryId(e.target.value)}
-                  required
-                >
-                  <option value="">選択してください</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
+                <label className="block font-medium">カテゴリ選択</label>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm text-gray-600">メインカテゴリ</label>
+                    <select
+                      className="w-full border rounded px-3 py-2"
+                      value={selectedMainCat}
+                      onChange={(e) => handleMainCategoryChange(e.target.value)}
+                      required
+                    >
+                      <option value="">選択してください</option>
+                      {mainCategories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm text-gray-600">サブカテゴリ</label>
+                    <select
+                      className="w-full border rounded px-3 py-2"
+                      value={categoryId}
+                      onChange={e => setCategoryId(e.target.value)}
+                      required
+                      disabled={!selectedMainCat}
+                    >
+                      <option value="">選択してください</option>
+                      {subCategories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block font-medium">タグ（カンマ区切り）</label>
