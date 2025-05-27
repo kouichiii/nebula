@@ -4,26 +4,25 @@ import { hash } from 'bcryptjs';
 import fs from 'fs/promises';
 import path from 'path';
 import dotenv from 'dotenv';
-dotenv.config(); // ← 必須！
+dotenv.config();
 
 const prisma = new PrismaClient();
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 async function main() {
-  // 既存データ削除
-  await prisma.article.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.user.deleteMany();
-
-  // JSON 読み込み
+  // JSON読み込み
   const usersPath = path.join(__dirname, 'seed-data', 'users.json');
   const articlesPath = path.join(__dirname, 'seed-data', 'articles.json');
+  const categoriesPath = path.join(__dirname, 'seed-data', 'categories.json');
 
-  const usersData = await fs.readFile(usersPath, 'utf-8');
-  const articlesData = await fs.readFile(articlesPath, 'utf-8');
+  const [usersData, articlesData, categoriesData] = await Promise.all([
+    fs.readFile(usersPath, 'utf-8'),
+    fs.readFile(articlesPath, 'utf-8'),
+    fs.readFile(categoriesPath, 'utf-8'),
+  ]);
 
   const users = JSON.parse(usersData) as {
     name: string;
@@ -35,19 +34,49 @@ async function main() {
     title: string;
     excerpt: string;
     content: string;
-    category: string;
+    category: string; // 小カテゴリ名
     authorEmail: string;
     tags?: string[];
   }[];
 
-  // ユーザー作成
+  const categories = JSON.parse(categoriesData) as {
+    main: string;
+    subs: string[];
+  }[];
+
+  // 削除（順序に注意）
+  await prisma.article.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.mainCategory.deleteMany();
+  await prisma.user.deleteMany();
+
+  // カテゴリ登録
+  const categoryMap: Record<string, string> = {};
+
+  for (const category of categories) {
+    const main = await prisma.mainCategory.create({
+      data: { name: category.main },
+    });
+
+    for (const sub of category.subs) {
+      const category = await prisma.category.create({
+        data: {
+          name: sub,
+          mainCategoryId: main.id,
+        },
+      });
+      categoryMap[sub] = category.id;
+    }
+  }
+
+  // ユーザー登録
   const userMap: Record<string, string> = {};
+
   for (const user of users) {
-    // まずSupabaseでユーザーを作成
     const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
       email: user.email,
       password: user.password,
-      email_confirm: true
+      email_confirm: true,
     });
 
     if (signUpError || !authData.user) {
@@ -55,7 +84,6 @@ async function main() {
       continue;
     }
 
-    // 次にPrismaでユーザーを作成
     const createdUser = await prisma.user.create({
       data: {
         id: authData.user.id,
@@ -63,34 +91,25 @@ async function main() {
         email: user.email,
       },
     });
+
     userMap[user.email] = createdUser.id;
   }
 
-  // カテゴリ収集・作成
-  const uniqueCategories = Array.from(new Set(articles.map((a) => a.category)));
-  const categoryMap: Record<string, string> = {};
-  for (const category of uniqueCategories) {
-    const createdCategory = await prisma.category.create({
-      data: { name: category },
-    });
-    categoryMap[category] = createdCategory.id;
-  }
-
-  // 記事作成
+  // 記事登録
   for (const article of articles) {
     const fileName = `articles/${Date.now()}_${Math.random().toString(36).slice(2)}.txt`;
     const contentBuffer = Buffer.from(article.content, 'utf-8');
 
-    const { error } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('articles')
       .upload(fileName, contentBuffer, {
         contentType: 'text/plain',
         upsert: true,
       });
 
-    if (error) {
-      console.error('❌ Upload Error:', error);
-      throw error;
+    if (uploadError) {
+      console.error('❌ Upload Error:', uploadError);
+      continue;
     }
 
     await prisma.article.create({
@@ -103,8 +122,9 @@ async function main() {
         tags: article.tags || [],
       },
     });
-    console.log(`✅ Users: ${users.length}, Articles: ${articles.length}`);
   }
+
+  console.log(`✅ Seed completed: ${users.length} users, ${articles.length} articles`);
 }
 
 main()

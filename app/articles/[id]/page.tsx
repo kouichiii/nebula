@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { prisma } from '@/lib/prisma';
-import supabase from '@/lib/supabase';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import ArticleContent from '@/app/articles/components/ArticleContent';
 import { generateTableOfContents } from '@/lib/utils/tableOfContents';
 import TableOfContents from '../components/TableOfContents';
@@ -35,7 +36,10 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { id } = params;
-  const session = await supabase.auth.getSession().then(({ data }) => data.session);
+  
+  // セッション取得方法を変更
+  const supabase = createServerComponentClient({ cookies });
+  const { data: { session } } = await supabase.auth.getSession();
 
   const article = await prisma.article.findUnique({
     where: { id },

@@ -56,11 +56,6 @@ export async function GET(request: Request) {
   const q = searchParams.get('q')?.trim() || ''
   const categoryId = searchParams.get('categoryId')?.trim() || ''
 
-  // ← ここを追加
-  console.log("[API] /api/articles called");
-  console.log("  q          =", JSON.stringify(q));
-  console.log("  categoryId =", JSON.stringify(categoryId));
-
   // キーワード検索条件
   const keywordWhere: any = q
     ? {

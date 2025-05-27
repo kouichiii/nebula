@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { use } from 'react';
 
 export async function POST(
   request: Request,
