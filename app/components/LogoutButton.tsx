@@ -4,11 +4,16 @@
 import supabase from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
-export default function LogoutButton() {
+interface LogoutButtonProps {
+  onClick?: () => void;
+}
+
+export default function LogoutButton({ onClick }: LogoutButtonProps) {
   const router = useRouter();
   const signOut = async ({ callbackUrl }: { callbackUrl: string }) => {
     try {
-      let { error } = await supabase.auth.signOut()
+      await supabase.auth.signOut();
+      onClick?.(); // メニューを閉じる
       router.push(callbackUrl);
     } catch (error) {
       console.error('Logout error:', error);
