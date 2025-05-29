@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import supabase from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams?.get('returnTo') || '/';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,16 +22,21 @@ export default function SignInPage() {
     setError('');
 
     try {
+      const supabase = createClientComponentClient();
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
       if (error) {
         console.error('Supabase signIn error:', error);
         setError('ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。');
         return;
       }
-      window.location.href = '/';
+      
+      // ログイン成功後、ページをリフレッシュしてからリダイレクト
+      // これによりサイドバーの表示も更新される
+      window.location.href = returnTo;
     } catch (error) {
       setError('ログイン中にエラーが発生しました。');
     } finally {

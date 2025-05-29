@@ -38,13 +38,7 @@ export default function SwipePage() {
 
   if (!articles[index]) {
     return (
-      <div className="min-h-screen relative bg-gradient-to-br from-purple-50 via-white to-pink-50 overflow-hidden">
-        {/* 背景デコレーション */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-purple-200/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-pink-200/20 rounded-full blur-3xl animate-pulse" />
-        </div>
-
+      <div className="min-h-screen relative overflow-hidden">
         {/* スワイプインジケーター */}
         <div className="absolute inset-x-0 top-4 sm:top-8 flex flex-col sm:flex-row justify-center items-center sm:space-x-8 space-y-2 sm:space-y-0 text-xs sm:text-sm font-medium px-4">
           <div className="flex items-center space-x-2 text-purple-400">
@@ -109,13 +103,7 @@ export default function SwipePage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 overflow-hidden">
-      {/* 背景デコレーション */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-purple-200/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-pink-200/20 rounded-full blur-3xl" />
-      </div>
-
+    <div className="relative min-h-screen overflow-hidden">
       {/* スワイプインジケーター */}
       <div className="absolute inset-x-0 top-4 sm:top-8 flex flex-col sm:flex-row justify-center items-center sm:space-x-8 space-y-2 sm:space-y-0 text-xs sm:text-sm font-medium px-4">
         <div className="flex items-center space-x-2 text-purple-600">
@@ -139,27 +127,29 @@ export default function SwipePage() {
           <FaTrashAlt size={48} />
         </div>
 
-        {/* スワイプカード */}
-        {articles.slice(index, index + 2).map((article, i) => (
-          <SwipeCard
-            key={article.id}
-            article={{
-              ...article,
-              user: {
-                ...article.user,
-                iconUrl: article.user.iconUrl === null ? undefined : article.user.iconUrl,
-              },
-            }}
-            onSwipe={(dir) => {
-              if (dir === 'right') {
-                setIndex((prev) => prev + 1);
-              } else {
-                router.push(`/articles/${article.id}`);
-              }
-            }}
-            isFront={i === 0}
-          />
-        ))}
+        {/* スワイプカード - 画面サイズに応じて調整 */}
+        <div className="w-full max-w-[90vh] max-h-[calc(100vh-8rem)] flex items-center justify-center">
+          {articles.slice(index, index + 2).map((article, i) => (
+            <SwipeCard
+              key={article.id}
+              article={{
+                ...article,
+                user: {
+                  ...article.user,
+                  iconUrl: article.user.iconUrl === null ? undefined : article.user.iconUrl,
+                },
+              }}
+              onSwipe={(dir) => {
+                if (dir === 'right') {
+                  setIndex((prev) => prev + 1);
+                } else {
+                  router.push(`/articles/${article.id}`);
+                }
+              }}
+              isFront={i === 0}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

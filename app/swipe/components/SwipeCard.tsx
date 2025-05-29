@@ -94,10 +94,16 @@ export default function SwipeCard({
         touchAction: 'none',
         zIndex: isFront ? 1 : 0,
         ...backCardSpring,
-        transformOrigin: 'top center',
+        transformOrigin: 'center center',
       }}
       className={`
-        absolute w-[400px] h-[600px] backdrop-blur-sm rounded-2xl p-8 
+        absolute 
+        w-[85%] sm:w-[90%] 
+        h-[75%] sm:h-[90%] 
+        max-w-[400px] max-h-[600px] 
+        aspect-[3/4]
+        backdrop-blur-sm rounded-2xl 
+        p-3 sm:p-4 md:p-6
         shadow-xl transition-shadow select-none border border-gray-100
         ${isFront 
           ? 'bg-white/90 hover:shadow-2xl' 
