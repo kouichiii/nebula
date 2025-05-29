@@ -32,24 +32,8 @@ model Category {
   articles       Article[]
 }
 
-model Article {
-  id            String      @id @default(cuid())
-  title         String
-  excerpt       String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  userId        String      @db.Uuid
-  categoryId    String      
-  tags          String[]
-  storagePath   String
-  user          User        @relation(fields: [userId], references: [id])
-  category      Category    @relation(fields: [categoryId], references: [id])
-  likes         Like[]
-  bookmarks      Bookmark[]
-}
-
 model User {
-  id        String    @id
+  id        String    @id @default(uuid()) // UUIDを使用することを明示
   email     String    @unique
   name      String
   iconUrl   String?
@@ -61,9 +45,25 @@ model User {
   bookmarks Bookmark[]
 }
 
-model Bookmark {
+model Article {
+  id         String   @id @default(uuid())
+  title      String
+  excerpt    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String   // UUIDではなくStringとして定義
+  categoryId String      
+  tags       String[]
+  storagePath String
+  user       User     @relation(fields: [userId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+  likes      Like[]
+  bookmarks  Bookmark[]
+}
+
+model Like {
   id        String   @id @default(uuid())
-  userId    String   // UUIDではなくStringに変更
+  userId    String
   articleId String
   createdAt DateTime @default(now())
   
@@ -75,9 +75,9 @@ model Bookmark {
   @@index([articleId])
 }
 
-model Like {
+model Bookmark {
   id        String   @id @default(uuid())
-  userId    String   // UUIDではなくStringに変更
+  userId    String
   articleId String
   createdAt DateTime @default(now())
   
