@@ -56,3 +56,93 @@ body {
   overflow-x: auto;
 }
 
+/* 記事見出しのスタイル */
+.prose h1 {
+  font-size: 2.25rem !important; /* 36px */
+  margin-top: 2rem !important; /* 上のマージンを増やす */
+  margin-bottom: 1.5rem !important; /* 下のマージンも若干増やす */
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  color: #4b5563 !important;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1.25rem !important; /* 下線とテキストの間のスペースをさらに増やす */
+}
+
+.prose h2 {
+  font-size: 1.875rem !important; /* 30px */
+  margin-top: 1.75rem !important;
+  margin-bottom: 1rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  color: #4b5563 !important;
+}
+
+.prose h3 {
+  font-size: 1.5rem !important; /* 24px */
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  color: #4b5563 !important;
+}
+
+.prose h4 {
+  font-size: 1.25rem !important; /* 20px */
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.75rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #4b5563 !important;
+}
+
+.prose h5 {
+  font-size: 1.125rem !important; /* 18px */
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #4b5563 !important;
+}
+
+.prose h6 {
+  font-size: 1rem !important; /* 16px */
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #6b7280 !important;
+}
+
+/* 段落の下線との間隔を増やす */
+.prose p {
+  padding-bottom: 0.75rem !important; /* 下線との間のパディングも追加 */
+}
+/* リスト要素の下側マージンも同様に調整 */
+.prose ul, .prose ol {
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+/* モバイルでの見出しサイズを調整 */
+@media (max-width: 640px) {
+  .prose h1 {
+    font-size: 1.875rem !important; /* 30px */
+  }
+  
+  .prose h2 {
+    font-size: 1.5rem !important; /* 24px */
+  }
+  
+  .prose h3 {
+    font-size: 1.25rem !important; /* 20px */
+  }
+  
+  .prose h4 {
+    font-size: 1.125rem !important; /* 18px */
+  }
+  
+  .prose h5, .prose h6 {
+    font-size: 1rem !important; /* 16px */
+  }
+}
+

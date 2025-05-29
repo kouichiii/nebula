@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useSpring, animated as a } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
+
 type ArticleCard = {
   user: {
     iconUrl?: string;
@@ -28,32 +29,33 @@ export default function SwipeCard({
     x: 0,
     rotate: 0,
     opacity: 1,
-    // スプリングの設定を追加
     config: {
       tension: 180,
-      friction: 12
-    }
+      friction: 12,
+    },
   }));
 
-  // バックカード用のスプリングアニメーション
   const backCardSpring = useSpring({
     scale: isFront ? 1 : 0.95,
     y: isFront ? 0 : 10,
     opacity: isFront ? 1 : 0.8,
     config: {
       tension: 180,
-      friction: 12
-    }
+      friction: 12,
+    },
   });
 
-  const bind = useDrag(({ down, movement: [mx], direction: [xDir], velocity }) => {
+  const bind = useDrag(({ down, movement: [mx], velocity: [vx] }) => {
     if (!isFront) return;
 
-    const threshold = 150;
+    // デバイスサイズに応じたスワイプ判定の調整
+    const isMobile = window.innerWidth < 640;
+    const threshold = isMobile ? 100 : 150; // モバイルではしきい値を低く
+    const velocityThreshold = isMobile ? 0.2 : 0.5; // モバイルでは速度判定を緩く
 
-    if (!down && Math.abs(x.get()) > threshold) {
-      const dir = x.get() > 0 ? 'right' : 'left';
-      const signX = x.get() > 0 ? 1 : -1;
+    if (!down && (Math.abs(mx) > threshold || Math.abs(vx) > velocityThreshold)) {
+      const dir = mx > 0 ? 'right' : 'left';
+      const signX = mx > 0 ? 1 : -1;
       api.start({ x: signX * 1000, rotate: signX * 20, opacity: 0 });
       setTimeout(() => onSwipe(dir), 300);
       return;
@@ -62,20 +64,26 @@ export default function SwipeCard({
     api.start({ x: down ? mx : 0, rotate: down ? mx / 20 : 0, opacity: 1 });
   });
 
+  const handleSwipe = (dir: 'left' | 'right') => {
+    const signX = dir === 'right' ? 1 : -1;
+    api.start({ x: signX * 1000, rotate: signX * 20, opacity: 0 });
+    setTimeout(() => onSwipe(dir), 300);
+  };
+
   useEffect(() => {
     if (!isFront) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
-        onSwipe('left');
+        handleSwipe('left');
       } else if (e.key === 'ArrowRight') {
-        onSwipe('right');
+        handleSwipe('right');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFront, onSwipe]);
+  }, [isFront]);
 
   return (
     <a.div
@@ -85,7 +93,7 @@ export default function SwipeCard({
         rotate,
         touchAction: 'none',
         zIndex: isFront ? 1 : 0,
-        ...backCardSpring, // バックカードのアニメーション適用
+        ...backCardSpring,
         transformOrigin: 'top center',
       }}
       className={`
@@ -126,8 +134,18 @@ export default function SwipeCard({
 
         {/* アクションインジケーター */}
         <div className="flex justify-between text-sm font-medium">
-          <span className="text-purple-600">← 記事を読む</span>
-          <span className="text-gray-500">スキップ →</span>
+          <button
+            className="text-purple-600"
+            onClick={() => handleSwipe('left')}
+          >
+            ← 記事を読む
+          </button>
+          <button
+            className="text-gray-500"
+            onClick={() => handleSwipe('right')}
+          >
+            スキップ →
+          </button>
         </div>
       </div>
     </a.div>
