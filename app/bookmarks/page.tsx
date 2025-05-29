@@ -57,9 +57,11 @@ export default function BookmarksPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-            あなたのブックマーク
-          </h1>
+          {/* ヘッダーもスケルトン表示に変更 */}
+          <div className="animate-pulse flex items-center mb-8">
+            <div className="w-6 h-6 bg-yellow-200/50 mr-3 rounded"></div>
+            <div className="h-8 bg-gradient-to-r from-purple-200/50 to-pink-200/50 rounded-lg w-64"></div>
+          </div>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (

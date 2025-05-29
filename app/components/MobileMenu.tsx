@@ -92,16 +92,31 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ userId }) => {
                 ))}
 
                 {userId && (
-                  <Link
-                    href="/articles/new"
-                    className="flex items-center gap-3 px-6 py-4 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 active:from-purple-100 active:to-pink-100 rounded-2xl transition-all group"
-                    onClick={closeMenu}
-                  >
-                    <span className="p-2 rounded-xl bg-purple-50 text-purple-500 group-hover:bg-white group-hover:shadow-sm transition-all">
-                      ✏️
-                    </span>
-                    <span className="font-medium">新規記事を投稿</span>
-                  </Link>
+                  <>
+                    <Link
+                      href="/articles/new"
+                      className="flex items-center gap-3 px-6 py-4 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 active:from-purple-100 active:to-pink-100 rounded-2xl transition-all group"
+                      onClick={closeMenu}
+                    >
+                      <span className="p-2 rounded-xl bg-purple-50 text-purple-500 group-hover:bg-white group-hover:shadow-sm transition-all">
+                        ✏️
+                      </span>
+                      <span className="font-medium">新規記事を投稿</span>
+                    </Link>
+                    
+                    <Link
+                      href="/bookmarks"
+                      className="flex items-center gap-3 px-6 py-4 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 active:from-purple-100 active:to-pink-100 rounded-2xl transition-all group"
+                      onClick={closeMenu}
+                    >
+                      <span className="p-2 rounded-xl bg-purple-50 text-purple-500 group-hover:bg-white group-hover:shadow-sm transition-all">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                        </svg>
+                      </span>
+                      <span className="font-medium">ブックマーク一覧</span>
+                    </Link>
+                  </>
                 )}
 
                 <div className="border-t pt-4 border-purple-100/50">
