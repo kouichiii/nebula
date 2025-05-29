@@ -45,6 +45,7 @@ model Article {
   user          User        @relation(fields: [userId], references: [id])
   category      Category    @relation(fields: [categoryId], references: [id])
   likes         Like[]
+  bookmarks      Bookmark[]
 }
 
 model User {
@@ -57,6 +58,7 @@ model User {
   updatedAt DateTime  @updatedAt
   articles  Article[]
   likes     Like[]
+  bookmarks Bookmark[]
 }
 
 model Like {
@@ -70,4 +72,18 @@ model Like {
   @@unique([userId, articleId])
   @@index([articleId])
   @@index([userId])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+  
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleId])
+  @@index([userId])
+  @@index([articleId])
 }

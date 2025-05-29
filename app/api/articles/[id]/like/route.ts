@@ -43,30 +43,40 @@ export async function POST(
       },
     });
 
-    if (existingLike) {
-      // いいね解除
-      await prisma.like.delete({
-        where: { id: existingLike.id },
-      });
+    let likeCount: number;
 
-      const likeCount = await prisma.like.count({
-        where: { articleId },
-      });
+    if (existingLike) {
+      // いいね解除 - トランザクションで一括処理
+      const result = await prisma.$transaction([
+        prisma.like.delete({
+          where: { id: existingLike.id },
+        }),
+        prisma.like.count({
+          where: { articleId },
+        }),
+      ]);
+
+      // カウント結果は配列の2番目の要素
+      likeCount = result[1];
 
       return NextResponse.json({ liked: false, count: likeCount });
     }
 
-    // いいね追加
-    await prisma.like.create({
-      data: {
-        userId: userId,
-        articleId,
-      },
-    });
+    // いいね追加 - トランザクションで一括処理
+    const result = await prisma.$transaction([
+      prisma.like.create({
+        data: {
+          userId: userId,
+          articleId,
+        },
+      }),
+      prisma.like.count({
+        where: { articleId },
+      }),
+    ]);
 
-    const likeCount = await prisma.like.count({
-      where: { articleId },
-    });
+    // カウント結果は配列の2番目の要素
+    likeCount = result[1]; // 既に作成済みなのでそのままのカウントを使用
 
     return NextResponse.json({ liked: true, count: likeCount });
   } catch (error) {
