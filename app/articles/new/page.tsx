@@ -11,8 +11,15 @@ interface CategoryWithSubs extends MainCategory {
 
 export default function NewArticlePage() {
   const router = useRouter();
+  
+  // ステップ1: 記事本文
+  const [body, setBody] = useState('');
+  
+  // ステップ2: タイトル、概要、カテゴリなどの詳細情報
   const [title, setTitle] = useState('');
   const [excerpt, setExcerpt] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
   const [tags, setTags] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [mainCategories, setMainCategories] = useState<CategoryWithSubs[]>([]);
@@ -20,8 +27,6 @@ export default function NewArticlePage() {
   const [subCategories, setSubCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [body, setBody] = useState('# ここに本文を書きましょう\n\nマークダウン形式で記述できます。');
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -72,42 +77,35 @@ export default function NewArticlePage() {
   };
 
   const handleNextStep = () => {
-    if (title.trim() && body.trim()) {
-      setShowModal(true);
+    if (!body.trim()) {
+      alert('記事の本文を入力してください');
+      return;
     }
+    setShowModal(true);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-4xl font-bold mb-6 pt-8 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-          記事を投稿する
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 pt-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+          新しい記事を書く
         </h1>
         
-        {/* ステップ1: タイトルと本文 */}
-        <div className="space-y-6 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
-          <div>
-            <label className="block font-medium text-gray-700 mb-2">タイトル</label>
-            <input
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 
-              focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              required
-              placeholder="記事のタイトルを入力してください"
-            />
+        {/* ステップ1: まず記事本文を入力 */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg mb-6">
+          <h2 className="text-xl font-semibold mb-4">本文を入力</h2>
+          <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
+            <MarkdownEditor value={body} onChange={setBody} />
           </div>
-          <div>
-            <label className="block font-medium text-gray-700 mb-2">本文</label>
-            <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
-              <MarkdownEditor value={body} onChange={setBody} />
-            </div>
-          </div>
-          <div className="flex justify-end">
+          
+          <div className="flex justify-between items-center mt-4">
+            <p className="text-sm text-gray-500">{body.length} 文字</p>
             <button
               onClick={handleNextStep}
-              className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-3 
-              rounded-full hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+              disabled={!body.trim()}
+              className={`px-4 py-2 rounded-lg text-white ${
+                body.trim() ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-300 cursor-not-allowed'
+              } transition-colors`}
             >
               次へ
             </button>
@@ -115,28 +113,50 @@ export default function NewArticlePage() {
         </div>
       </div>
 
-      {/* モーダル: カテゴリと概要の設定 */}
+      {/* タイトルと概要を同時に入力するモーダル */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl">
-            <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-              記事の詳細設定
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl sm:text-2xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+              記事の詳細情報
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* タイトル入力 */}
+              <div>
+                <label className="block font-medium text-gray-700 mb-2">タイトル</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="記事のタイトルを入力してください"
+                />
+                <div className="flex justify-end mt-1">
+                  <span className="text-xs text-gray-500">{title.length}/100</span>
+                </div>
+              </div>
+              
+              {/* 概要入力 */}
               <div>
                 <label className="block font-medium text-gray-700 mb-2">概要</label>
                 <textarea
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 
-                  focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  rows={3}
                   value={excerpt}
                   onChange={e => setExcerpt(e.target.value)}
                   required
-                  placeholder="記事の概要を入力してください"
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="記事の概要を入力してください（検索結果などに表示されます）"
                 />
+                <div className="flex justify-end mt-1">
+                  <span className="text-xs text-gray-500">{excerpt.length}/200</span>
+                </div>
               </div>
+              
+              {/* カテゴリー選択 */}
               <div>
-                <label className="block font-medium text-gray-700 mb-2">カテゴリ選択</label>
+                <label className="block font-medium text-gray-700 mb-2">カテゴリ</label>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">メインカテゴリ</label>
@@ -172,8 +192,10 @@ export default function NewArticlePage() {
                   </div>
                 </div>
               </div>
+              
+              {/* タグ入力 */}
               <div>
-                <label className="block font-medium text-gray-700 mb-2">タグ（カンマ区切り）</label>
+                <label className="block font-medium text-gray-700 mb-2">タグ</label>
                 <input
                   className="w-full border border-gray-200 rounded-lg px-4 py-3 
                   focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -182,28 +204,26 @@ export default function NewArticlePage() {
                   placeholder="例: 技術,プログラミング,Next.js"
                 />
               </div>
-
+              
               {error && (
                 <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
                   {error}
                 </div>
               )}
 
-              <div className="flex justify-end space-x-4 pt-4">
+              {/* ボタン */}
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-8 py-3 border-2 border-purple-600 text-purple-600 rounded-full 
-                  hover:bg-purple-50 transition-all duration-200"
+                  className="px-6 py-2 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50"
                 >
                   戻る
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white 
-                  rounded-full hover:shadow-lg transform hover:-translate-y-0.5 
-                  transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg hover:shadow-md disabled:opacity-50"
                 >
                   {isSubmitting ? '投稿中...' : '投稿する'}
                 </button>
