@@ -106,6 +106,16 @@ export default function NewArticlePage() {
         {isMobile ? (
           // モバイル向けのXスタイルレイアウト - 高さを最大化
           <div className="flex-1 flex flex-col space-y-4 bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-md overflow-hidden">
+            <div className="bg-purple-50 rounded-lg px-3 py-2 mb-2 text-sm text-purple-700">
+              <p className="font-medium mb-1">💡 マークダウン形式で書けます</p>
+              <p className="text-xs">
+                <span className="inline-block px-1.5 py-0.5 bg-white rounded mr-1 font-mono"># 見出し</span>
+                <span className="inline-block px-1.5 py-0.5 bg-white rounded mr-1 font-mono">**太字**</span>
+                <span className="inline-block px-1.5 py-0.5 bg-white rounded mr-1 font-mono">*斜体*</span>
+                <span className="inline-block px-1.5 py-0.5 bg-white rounded mr-1 font-mono">[リンク](URL)</span>
+              </p>
+            </div>
+            
             <div className="flex-1 border border-gray-100 rounded-lg shadow-sm overflow-hidden">
               <MarkdownEditor 
                 value={body} 
@@ -150,10 +160,53 @@ export default function NewArticlePage() {
             </div>
             <div>
               <label className="block font-medium text-gray-700 mb-2">本文</label>
+              <div className="bg-purple-50 rounded-lg px-4 py-3 mb-4 text-sm text-purple-700">
+                <p className="font-medium mb-2">💡 マークダウン形式で書くことができます</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <div className="bg-white rounded p-2">
+                    <code className="font-mono"># 見出し1</code>
+                    <p className="mt-1 font-medium">→ 大見出し</p>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <code className="font-mono">## 見出し2</code>
+                    <p className="mt-1 font-medium">→ 中見出し</p>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <code className="font-mono">**太字**</code>
+                    <p className="mt-1 font-medium">→ <strong>太字</strong></p>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <code className="font-mono">*斜体*</code>
+                    <p className="mt-1 font-medium">→ <em>斜体</em></p>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <code className="font-mono">[リンク](URL)</code>
+                    <p className="mt-1 font-medium">→ リンク</p>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <code className="font-mono">![画像](URL)</code>
+                    <p className="mt-1 font-medium">→ 画像</p>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <code className="font-mono">- リスト項目</code>
+                    <p className="mt-1 font-medium">→ 箇条書き</p>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <code className="font-mono">`コード`</code>
+                    <p className="mt-1 font-medium">→ <code>コード</code></p>
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-right">
+                  <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                    マークダウン構文の詳細 →
+                  </a>
+                </p>
+              </div>
               <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
                 <MarkdownEditor value={body} onChange={setBody} />
               </div>
             </div>
+            
             <div className="flex justify-end">
               <button
                 onClick={handleNextStep}
